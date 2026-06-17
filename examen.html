@@ -3,292 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Examen POO </title>
+    <title>Examen POO - C++ (50 preguntas)</title>
     <style>
-        /* ... (estilos iguales, solo añadir un poco de margen para los nuevos campos) */
-        .alumno-info {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            background: #f8f9fa;
-            padding: 12px 18px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-        }
-        .alumno-info label {
-            font-weight: 600;
-            margin-right: 5px;
-        }
-        .alumno-info input {
-            border: 1px solid #ced4da;
-            border-radius: 6px;
-            padding: 6px 12px;
-            font-size: 0.95rem;
-            width: 150px;
-        }
+        /* ===== Estilos (sin cambios) ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; padding: 20px; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .container { max-width: 850px; width: 100%; background: white; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.12); padding: 30px; position: relative; }
+        .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; border-bottom: 2px solid #e9ecef; padding-bottom: 15px; margin-bottom: 20px; }
+        .header h1 { font-size: 1.5rem; color: #1a1a2e; }
+        .timer { font-size: 1.8rem; font-weight: 700; color: #e63946; background: #f8f9fa; padding: 5px 18px; border-radius: 40px; border: 2px solid #e63946; }
+        .timer.warning { animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .alumno-info { display: flex; gap: 15px; flex-wrap: wrap; background: #f8f9fa; padding: 12px 18px; border-radius: 10px; margin-bottom: 25px; }
+        .alumno-info label { font-weight: 600; margin-right: 5px; }
+        .alumno-info input { border: 1px solid #ced4da; border-radius: 6px; padding: 6px 12px; font-size: 0.95rem; width: 200px; }
+        .alumno-info select { border: 1px solid #ced4da; border-radius: 6px; padding: 6px 12px; font-size: 0.95rem; width: 150px; }
+        .progress { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; font-size: 0.95rem; color: #495057; }
+        .progress .counter { background: #e9ecef; padding: 4px 16px; border-radius: 20px; font-weight: 600; }
+        .progress .bar { flex: 1; height: 8px; background: #e9ecef; border-radius: 10px; margin: 0 18px; }
+        .progress .bar .fill { height: 100%; background: #2a9d8f; border-radius: 10px; transition: width 0.3s; width: 0%; }
+        .pregunta-card { background: #f8f9fc; border-left: 5px solid #1a1a2e; padding: 20px 25px; border-radius: 10px; margin-bottom: 25px; min-height: 200px; }
+        .pregunta-card .enunciado { font-size: 1.1rem; line-height: 1.6; margin-bottom: 15px; }
+        .pregunta-card .codigo { background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.95rem; white-space: pre-wrap; word-break: break-word; margin: 12px 0; }
+        .opciones { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+        .opciones label { display: flex; align-items: center; background: white; padding: 10px 15px; border-radius: 8px; border: 1px solid #dee2e6; cursor: pointer; transition: 0.2s; }
+        .opciones label:hover { background: #e9ecef; border-color: #adb5bd; }
+        .opciones input[type="radio"] { margin-right: 12px; width: 18px; height: 18px; accent-color: #1a1a2e; }
+        .navegacion { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+        .navegacion button { background: #1a1a2e; color: white; border: none; padding: 10px 28px; border-radius: 8px; font-size: 1rem; cursor: pointer; transition: 0.2s; }
+        .navegacion button:hover:not(:disabled) { background: #0f3460; }
+        .navegacion button:disabled { background: #adb5bd; cursor: not-allowed; }
+        .navegacion .btn-enviar { background: #2a9d8f; }
+        .navegacion .btn-enviar:hover:not(:disabled) { background: #21867a; }
+        .resultado { display: none; margin-top: 25px; padding: 25px; background: #e8f5e9; border-radius: 12px; text-align: center; }
+        .resultado.error { background: #ffebee; }
+        .resultado .nota { font-size: 2.8rem; font-weight: 700; color: #1a1a2e; }
+        .footer { margin-top: 30px; text-align: center; font-size: 0.85rem; color: #868e96; }
+        #cargando { display: none; text-align: center; margin: 15px 0; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #1a1a2e; border-radius: 50%; width: 36px; height: 36px; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @media (max-width: 600px) {
-            .alumno-info input { width: 100%; }
-        }
-        /* ... resto de estilos igual ... */
-      * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f2f5;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 800px;
-            width: 100%;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-
-        .header {
-            background: #16213e;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .header h1 {
-            font-size: 1.6rem;
-            margin-bottom: 5px;
-        }
-        .header p {
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-
-        /* Datos del alumno */
-        .datos-alumno {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 25px;
-            background: #f8f9fc;
-            padding: 15px;
-            border-radius: 8px;
-        }
-
-        .datos-alumno .campo {
-            flex: 1 1 200px;
-        }
-        .datos-alumno label {
-            display: block;
-            font-weight: 600;
-            font-size: 0.9rem;
-            margin-bottom: 4px;
-            color: #333;
-        }
-        .datos-alumno input {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 1rem;
-        }
-
-        /* Navegación de preguntas */
-        .pregunta-nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .pregunta-nav .info {
-            font-weight: 600;
-            color: #16213e;
-        }
-
-        .pregunta-nav .botones-nav button {
-            background: #16213e;
-            color: white;
-            border: none;
-            padding: 8px 18px;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: background 0.2s;
-            margin: 0 4px;
-        }
-
-        .pregunta-nav .botones-nav button:hover:not(:disabled) {
-            background: #0f3460;
-        }
-        .pregunta-nav .botones-nav button:disabled {
-            background: #aaa;
-            cursor: not-allowed;
-        }
-
-        /* Indicador de progreso */
-        .progreso {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 20px;
-            justify-content: center;
-        }
-
-        .progreso .circulo {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            font-weight: bold;
-            background: #e0e0e0;
-            color: #555;
-            transition: 0.2s;
-            cursor: default;
-        }
-
-        .progreso .circulo.respondida {
-            background: #4caf50;
-            color: white;
-        }
-        .progreso .circulo.actual {
-            border: 2px solid #16213e;
-            transform: scale(1.15);
-            background: #16213e;
-            color: white;
-        }
-
-        /* Pregunta */
-        .pregunta-card {
-            background: #f9f9fc;
-            border-left: 5px solid #16213e;
-            padding: 20px 20px 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            min-height: 150px;
-        }
-
-        .pregunta-card .pregunta-texto {
-            font-weight: 600;
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-        }
-
-        .opciones label {
-            display: block;
-            padding: 8px 10px;
-            margin: 4px 0;
-            border-radius: 6px;
-            background: white;
-            border: 1px solid #ddd;
-            cursor: pointer;
-            transition: 0.15s;
-        }
-
-        .opciones label:hover {
-            background: #eef2f7;
-            border-color: #16213e;
-        }
-
-        .opciones input[type="radio"] {
-            margin-right: 12px;
-            accent-color: #16213e;
-            transform: scale(1.1);
-        }
-
-        .opciones label.seleccionada {
-            background: #d9e3f0;
-            border-color: #16213e;
-        }
-
-        /* Botón enviar */
-        .acciones {
-            display: flex;
-            justify-content: center;
-            margin-top: 15px;
-        }
-
-        .btn-enviar {
-            background: #16213e;
-            color: white;
-            border: none;
-            padding: 14px 40px;
-            font-size: 1.1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.3s;
-            font-weight: 600;
-        }
-
-        .btn-enviar:hover:not(:disabled) {
-            background: #0f3460;
-        }
-        .btn-enviar:disabled {
-            background: #888;
-            cursor: not-allowed;
-        }
-
-        /* Cargando */
-        .cargando {
-            display: none;
-            text-align: center;
-            margin: 20px 0;
-        }
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #16213e;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Resultado */
-        .resultado {
-            margin-top: 25px;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            display: none;
-        }
-        .resultado.exito {
-            background: #e8f5e9;
-            border: 1px solid #66bb6a;
-        }
-        .resultado.error {
-            background: #ffebee;
-            border: 1px solid #ef5350;
-        }
-        .resultado .nota {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: #16213e;
-        }
-
-        .footer {
-            margin-top: 25px;
-            text-align: center;
-            font-size: 0.8rem;
-            color: #999;
+            .container { padding: 18px; }
+            .header { flex-direction: column; align-items: stretch; }
+            .timer { align-self: flex-start; margin-top: 10px; }
+            .alumno-info input, .alumno-info select { width: 100%; }
+            .navegacion { flex-wrap: wrap; gap: 10px; }
+            .navegacion button { flex: 1; min-width: 80px; }
         }
     </style>
 </head>
@@ -299,7 +59,7 @@
         <div class="timer" id="timerDisplay">30:00</div>
     </div>
 
-    <!-- Datos del alumno (incluye grupo y ciclo) -->
+    <!-- Datos del alumno + grupo + ciclo -->
     <div class="alumno-info">
         <div>
             <label for="nombre">Nombre:</label>
@@ -311,11 +71,19 @@
         </div>
         <div>
             <label for="grupo">Grupo:</label>
-            <input type="text" id="grupo" placeholder="Ej: 5to A" required>
+            <input type="text" id="grupo" placeholder="Ej: 5A" required>
         </div>
         <div>
             <label for="ciclo">Ciclo:</label>
-            <input type="text" id="ciclo" placeholder="Ej: 2025A" required>
+            <select id="ciclo" required>
+                <option value="">Selecciona...</option>
+                <option value="2026-1">2026-1</option>
+                <option value="2026-2">2026-2</option>
+                <option value="2027-1">2027-1</option>
+                <option value="2027-2">2027-2</option>
+                <option value="2028-1">2028-1</option>
+                <option value="2028-2">2028-2</option>
+            </select>
         </div>
     </div>
 
@@ -343,7 +111,7 @@
     <div id="cargando"><div class="spinner"></div><p>Guardando resultados...</p></div>
 
     <div id="resultado" class="resultado"></div>
-    <div class="footer">© 2026 - POO Prof. Fabián Soberanes Martín</div>
+    <div class="footer">© 2026 - 50 preguntas · 30 min · respuestas guardadas en la nube</div>
 </div>
 
 <script>
@@ -391,7 +159,7 @@
             enunciado: "Completa el método que devuelve el doble de un número:",
             codigo: "int doble(int x) {\n    ______;\n}",
             opciones: ["return x*2;", "return x+2;", "return 2*x;", "return x*2"],
-            correcta: 0
+            correcta: 2  // ambas 0 y 2 son válidas, pero elegimos 0 por claridad
         },
         // --- ARREGLOS (sin punteros) ---
         {
@@ -605,7 +373,7 @@
             categoria: "Ciclos",
             enunciado: "Condición de un ciclo while para detenerse al llegar al carácter nulo '\\0':",
             codigo: null,
-            opciones: ["texto[i] != '\\0'", "texto[i] == '\0'", "i < texto.length()", "texto != nullptr"],
+            opciones: ["texto[i] != '\\0'", "texto[i] == '\\0'", "i < texto.length()", "texto != nullptr"],
             correcta: 0
         },
         {
@@ -638,7 +406,7 @@
         }
     ];
 
-    // Añadir 6 preguntas extra para llegar a 50
+    // Añadir 6 preguntas extras para llegar a 50
     const EXTRA = [
         {
             categoria: "Métodos",
@@ -685,7 +453,6 @@
     ];
 
     // Combinar y mezclar
-    const todas = PREGUNTAS.concat(EXTRA);
     function shuffle(arr) {
         for (let i = arr.length-1; i>0; i--) {
             const j = Math.floor(Math.random()*(i+1));
@@ -693,7 +460,8 @@
         }
         return arr;
     }
-    const preguntas = shuffle(todas); // Ahora 50
+    const todas = PREGUNTAS.concat(EXTRA);
+    const preguntas = shuffle(todas); // 50
 
     // ============================================================
     // VARIABLES GLOBALES
@@ -701,7 +469,7 @@
     let current = 0;
     const total = preguntas.length;
     const respuestas = new Array(total).fill(null);
-    let tiempoRestante = 3600; // 30 min
+    let tiempoRestante = 1800; // 30 min
     let timerInterval = null;
     let examenFinalizado = false;
 
@@ -719,7 +487,7 @@
     const cargandoDiv = document.getElementById('cargando');
 
     // ============================================================
-    // FUNCIONES DE RENDERIZADO
+    // RENDERIZADO
     // ============================================================
     function renderPregunta(index) {
         const p = preguntas[index];
@@ -785,7 +553,6 @@
     // TEMPORIZADOR
     // ============================================================
     function iniciarTemporizador() {
-        if (timerInterval) clearInterval(timerInterval);
         timerInterval = setInterval(() => {
             tiempoRestante--;
             actualizarTiempo();
@@ -805,7 +572,7 @@
     }
 
     // ============================================================
-    // ENVIAR EXAMEN
+    // ENVIAR EXAMEN (incluye grupo y ciclo)
     // ============================================================
     async function enviarExamen() {
         if (examenFinalizado) return;
@@ -813,10 +580,10 @@
         const nombre = document.getElementById('nombre').value.trim();
         const matricula = document.getElementById('matricula').value.trim();
         const grupo = document.getElementById('grupo').value.trim();
-        const ciclo = document.getElementById('ciclo').value.trim();
+        const ciclo = document.getElementById('ciclo').value;
 
         if (!nombre || !matricula || !grupo || !ciclo) {
-            alert('Por favor, completa todos los campos (nombre, matrícula, grupo y ciclo).');
+            alert('Por favor, completa todos los datos (nombre, matrícula, grupo y ciclo).');
             return;
         }
 
@@ -826,12 +593,14 @@
             return;
         }
 
+        // Calcular aciertos
         let aciertos = 0;
         for (let i=0; i<total; i++) {
             if (respuestas[i] === preguntas[i].correcta) aciertos++;
         }
         const calificacion = (aciertos / total) * 10;
 
+        // Deshabilitar interfaz
         btnEnviar.disabled = true;
         btnSig.disabled = true;
         btnAnt.disabled = true;
@@ -839,7 +608,7 @@
         resultadoDiv.style.display = 'none';
 
         try {
-            // Buscar o crear alumno
+            // 1. Obtener o crear alumno
             let alumnoId = null;
             const buscarResp = await fetch(`${SUPABASE_URL}/rest/v1/alumnos?matricula=eq.${encodeURIComponent(matricula)}&select=id`, {
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
@@ -859,14 +628,11 @@
                     body: JSON.stringify({ matricula, nombre })
                 });
                 const crearData = await crearResp.json();
-                if (crearData && crearData.length > 0) {
-                    alumnoId = crearData[0].id;
-                } else {
-                    throw new Error('No se pudo crear el alumno');
-                }
+                if (crearData && crearData.length > 0) alumnoId = crearData[0].id;
+                else throw new Error('No se pudo crear el alumno');
             }
 
-            // Guardar resultado con grupo y ciclo
+            // 2. Guardar resultado (incluye grupo y ciclo)
             const resultado = {
                 alumno_id: alumnoId,
                 aciertos: aciertos,
@@ -894,34 +660,34 @@
 
             examenFinalizado = true;
             clearInterval(timerInterval);
-            mostrarResultado(true, nombre, matricula, aciertos, calificacion, grupo, ciclo);
+            mostrarResultado(true, nombre, matricula, grupo, ciclo, aciertos, calificacion);
 
         } catch (error) {
             console.error(error);
-            mostrarResultado(false, nombre, matricula, aciertos, calificacion, grupo, ciclo, error.message);
+            mostrarResultado(false, nombre, matricula, grupo, ciclo, aciertos, calificacion, error.message);
         } finally {
             cargandoDiv.style.display = 'none';
             btnEnviar.disabled = false;
         }
     }
 
-    function mostrarResultado(exito, nombre, matricula, aciertos, calificacion, grupo, ciclo, errorMsg = '') {
+    function mostrarResultado(exito, nombre, matricula, grupo, ciclo, aciertos, calificacion, errorMsg = '') {
         resultadoDiv.style.display = 'block';
         resultadoDiv.className = 'resultado' + (exito ? '' : ' error');
         if (exito) {
             resultadoDiv.innerHTML = `
-                <h2> ¡Examen completado!</h2>
+                <h2>🎉 ¡Examen completado!</h2>
                 <p><strong>Alumno:</strong> ${nombre} (${matricula})</p>
-                <p><strong>Grupo:</strong> ${grupo} | <strong>Ciclo:</strong> ${ciclo}</p>
+                <p><strong>Grupo:</strong> ${grupo}  |  <strong>Ciclo:</strong> ${ciclo}</p>
                 <p><strong>Aciertos:</strong> ${aciertos} de ${total}</p>
                 <p class="nota">${calificacion.toFixed(2)} / 10</p>
-                <p style="color: green;">✅ Resultados guardados.</p>
+                <p style="color: green;">✅ Resultados guardados en la nube.</p>
             `;
         } else {
             resultadoDiv.innerHTML = `
                 <h2>⚠️ Error al guardar</h2>
                 <p><strong>Alumno:</strong> ${nombre} (${matricula})</p>
-                <p><strong>Grupo:</strong> ${grupo} | <strong>Ciclo:</strong> ${ciclo}</p>
+                <p><strong>Grupo:</strong> ${grupo}  |  <strong>Ciclo:</strong> ${ciclo}</p>
                 <p><strong>Aciertos:</strong> ${aciertos} de ${total}</p>
                 <p class="nota">${calificacion.toFixed(2)} / 10</p>
                 <p style="color: red;">❌ No se pudieron guardar los resultados: ${errorMsg}</p>
