@@ -30,6 +30,260 @@
             .alumno-info input { width: 100%; }
         }
         /* ... resto de estilos igual ... */
+            body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            background: #16213e;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            font-size: 1.6rem;
+            margin-bottom: 5px;
+        }
+        .header p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Datos del alumno */
+        .datos-alumno {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+            background: #f8f9fc;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .datos-alumno .campo {
+            flex: 1 1 200px;
+        }
+        .datos-alumno label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+            color: #333;
+        }
+        .datos-alumno input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        /* Navegación de preguntas */
+        .pregunta-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .pregunta-nav .info {
+            font-weight: 600;
+            color: #16213e;
+        }
+
+        .pregunta-nav .botones-nav button {
+            background: #16213e;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin: 0 4px;
+        }
+
+        .pregunta-nav .botones-nav button:hover:not(:disabled) {
+            background: #0f3460;
+        }
+        .pregunta-nav .botones-nav button:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+
+        /* Indicador de progreso */
+        .progreso {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .progreso .circulo {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            background: #e0e0e0;
+            color: #555;
+            transition: 0.2s;
+            cursor: default;
+        }
+
+        .progreso .circulo.respondida {
+            background: #4caf50;
+            color: white;
+        }
+        .progreso .circulo.actual {
+            border: 2px solid #16213e;
+            transform: scale(1.15);
+            background: #16213e;
+            color: white;
+        }
+
+        /* Pregunta */
+        .pregunta-card {
+            background: #f9f9fc;
+            border-left: 5px solid #16213e;
+            padding: 20px 20px 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            min-height: 150px;
+        }
+
+        .pregunta-card .pregunta-texto {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .opciones label {
+            display: block;
+            padding: 8px 10px;
+            margin: 4px 0;
+            border-radius: 6px;
+            background: white;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .opciones label:hover {
+            background: #eef2f7;
+            border-color: #16213e;
+        }
+
+        .opciones input[type="radio"] {
+            margin-right: 12px;
+            accent-color: #16213e;
+            transform: scale(1.1);
+        }
+
+        .opciones label.seleccionada {
+            background: #d9e3f0;
+            border-color: #16213e;
+        }
+
+        /* Botón enviar */
+        .acciones {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .btn-enviar {
+            background: #16213e;
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-enviar:hover:not(:disabled) {
+            background: #0f3460;
+        }
+        .btn-enviar:disabled {
+            background: #888;
+            cursor: not-allowed;
+        }
+
+        /* Cargando */
+        .cargando {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #16213e;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Resultado */
+        .resultado {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+        .resultado.exito {
+            background: #e8f5e9;
+            border: 1px solid #66bb6a;
+        }
+        .resultado.error {
+            background: #ffebee;
+            border: 1px solid #ef5350;
+        }
+        .resultado .nota {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #16213e;
+        }
+
+        .footer {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #999;
+        }
     </style>
 </head>
 <body>
