@@ -211,7 +211,15 @@
         </div>
         <div class="campo">
             <label for="ciclo">Ciclo:</label>
-            <input type="text" id="ciclo" placeholder="Ej: 2026-1" required>
+            <select id="ciclo" required>
+                <option value="">Selecciona...</option>
+                <option value="2026-1">2026-1</option>
+                <option value="2026-2">2026-2</option>
+                <option value="2027-1">2027-1</option>
+                <option value="2027-2">2027-2</option>
+                <option value="2028-1">2028-1</option>
+                <option value="2028-2">2028-2</option>
+            </select>
         </div>
     </div>
 
@@ -239,7 +247,7 @@
     <div id="cargando"><div class="spinner"></div><p>Guardando resultados...</p></div>
 
     <div id="resultado" class="resultado"></div>
-    <div class="footer">@ 2026 Prof Fabián Soberanes Martín</div>
+    <div class="footer">@ 2026 Prof. Fabián Soberanes Martín</div>
 </div>
 
 <script>
@@ -627,7 +635,7 @@
     let current = 0;
     const total = preguntas.length;
     const respuestas = new Array(total).fill(null);
-    let tiempoRestante = 1800; // 30 min
+    let tiempoRestante = 3600; // 30 min
     let timerInterval = null;
     let examenFinalizado = false;
 
@@ -837,11 +845,11 @@
         resultadoDiv.className = 'resultado ' + (exito ? 'exito' : 'error');
         if (exito) {
             resultadoDiv.innerHTML = `
-                <h2>🎉 ¡Examen completado!</h2>
+                <h2>¡Examen completado!</h2>
                 <p><strong>Alumno:</strong> ${nombre} (${matricula})</p>
                 <p><strong>Aciertos:</strong> ${aciertos} de ${total}</p>
                 <p class="nota">${calificacion.toFixed(2)} / 10</p>
-                <p style="color: green;">✅ Resultados guardados en la nube.</p>
+                <p style="color: green;">✅ Resultados guardados.</p>
             `;
         } else {
             resultadoDiv.innerHTML = `
