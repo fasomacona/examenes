@@ -3,98 +3,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Examen POO </title>
+    <title>Examen C++ - 50 preguntas</title>
     <style>
-        /* ===== Estilos (sin cambios) ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; padding: 20px; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
-        .container { max-width: 850px; width: 100%; background: white; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.12); padding: 30px; position: relative; }
-        .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; border-bottom: 2px solid #e9ecef; padding-bottom: 15px; margin-bottom: 20px; }
-        .header h1 { font-size: 1.5rem; color: #1a1a2e; }
-        .timer { font-size: 1.8rem; font-weight: 700; color: #e63946; background: #f8f9fa; padding: 5px 18px; border-radius: 40px; border: 2px solid #e63946; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 850px;
+            width:100%;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            padding: 30px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .header h1 { font-size: 1.5rem; color:#1a1a2e; }
+        .timer {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #e63946;
+            background: #f8f9fa;
+            padding: 5px 18px;
+            border-radius: 40px;
+            border: 2px solid #e63946;
+        }
         .timer.warning { animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-        .alumno-info { display: flex; gap: 15px; flex-wrap: wrap; background: #f8f9fa; padding: 12px 18px; border-radius: 10px; margin-bottom: 25px; }
-        .alumno-info label { font-weight: 600; margin-right: 5px; }
-        .alumno-info input { border: 1px solid #ced4da; border-radius: 6px; padding: 6px 12px; font-size: 0.95rem; width: 200px; }
-        .alumno-info select { border: 1px solid #ced4da; border-radius: 6px; padding: 6px 12px; font-size: 0.95rem; width: 150px; }
-        .progress { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; font-size: 0.95rem; color: #495057; }
-        .progress .counter { background: #e9ecef; padding: 4px 16px; border-radius: 20px; font-weight: 600; }
-        .progress .bar { flex: 1; height: 8px; background: #e9ecef; border-radius: 10px; margin: 0 18px; }
-        .progress .bar .fill { height: 100%; background: #2a9d8f; border-radius: 10px; transition: width 0.3s; width: 0%; }
-        .pregunta-card { background: #f8f9fc; border-left: 5px solid #1a1a2e; padding: 20px 25px; border-radius: 10px; margin-bottom: 25px; min-height: 200px; }
-        .pregunta-card .enunciado { font-size: 1.1rem; line-height: 1.6; margin-bottom: 15px; }
-        .pregunta-card .codigo { background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.95rem; white-space: pre-wrap; word-break: break-word; margin: 12px 0; }
-        .opciones { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
-        .opciones label { display: flex; align-items: center; background: white; padding: 10px 15px; border-radius: 8px; border: 1px solid #dee2e6; cursor: pointer; transition: 0.2s; }
-        .opciones label:hover { background: #e9ecef; border-color: #adb5bd; }
-        .opciones input[type="radio"] { margin-right: 12px; width: 18px; height: 18px; accent-color: #1a1a2e; }
-        .navegacion { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
-        .navegacion button { background: #1a1a2e; color: white; border: none; padding: 10px 28px; border-radius: 8px; font-size: 1rem; cursor: pointer; transition: 0.2s; }
-        .navegacion button:hover:not(:disabled) { background: #0f3460; }
-        .navegacion button:disabled { background: #adb5bd; cursor: not-allowed; }
-        .navegacion .btn-enviar { background: #2a9d8f; }
-        .navegacion .btn-enviar:hover:not(:disabled) { background: #21867a; }
-        .resultado { display: none; margin-top: 25px; padding: 25px; background: #e8f5e9; border-radius: 12px; text-align: center; }
-        .resultado.error { background: #ffebee; }
-        .resultado .nota { font-size: 2.8rem; font-weight: 700; color: #1a1a2e; }
-        .footer { margin-top: 30px; text-align: center; font-size: 0.85rem; color: #868e96; }
-        #cargando { display: none; text-align: center; margin: 15px 0; }
-        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #1a1a2e; border-radius: 50%; width: 36px; height: 36px; animation: spin 1s linear infinite; display: inline-block; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @media (max-width: 600px) {
-            .container { padding: 18px; }
-            .header { flex-direction: column; align-items: stretch; }
-            .timer { align-self: flex-start; margin-top: 10px; }
-            .alumno-info input, .alumno-info select { width: 100%; }
-            .navegacion { flex-wrap: wrap; gap: 10px; }
-            .navegacion button { flex: 1; min-width: 80px; }
+        @keyframes pulse { 0%{opacity:1;} 50%{opacity:0.5;} }
+        .alumno-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            background: #f8f9fa;
+            padding: 12px 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .alumno-info label { font-weight:600; margin-right:5px; }
+        .alumno-info input {
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size:0.95rem;
+            width: 180px;
+        }
+        .alumno-info .campo { display:flex; align-items:center; gap:4px; }
+        .progress {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            font-size:0.95rem;
+        }
+        .progress .counter {
+            background: #e9ecef;
+            padding: 2px 14px;
+            border-radius: 20px;
+            font-weight:600;
+        }
+        .progress .bar {
+            flex:1;
+            height:8px;
+            background:#e9ecef;
+            border-radius:10px;
+        }
+        .progress .bar .fill {
+            height:100%;
+            background:#2a9d8f;
+            border-radius:10px;
+            transition:width 0.3s;
+            width:0%;
+        }
+        .pregunta-card {
+            background: #f8f9fc;
+            border-left: 5px solid #1a1a2e;
+            padding: 20px 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+        .pregunta-card .enunciado {
+            font-size:1.1rem;
+            line-height:1.6;
+            margin-bottom:15px;
+        }
+        .pregunta-card .codigo {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size:0.95rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 12px 0;
+        }
+        .opciones {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .opciones label {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            cursor: pointer;
+            transition:0.2s;
+        }
+        .opciones label:hover { background:#e9ecef; border-color:#adb5bd; }
+        .opciones input[type="radio"] {
+            margin-right:12px;
+            width:18px; height:18px;
+            accent-color:#1a1a2e;
+        }
+        .navegacion {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap:10px;
+            margin-top: 20px;
+        }
+        .navegacion button {
+            background: #1a1a2e;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size:1rem;
+            cursor:pointer;
+            transition:0.2s;
+        }
+        .navegacion button:hover:not(:disabled) { background:#0f3460; }
+        .navegacion button:disabled { background:#adb5bd; cursor:not-allowed; }
+        .navegacion .btn-enviar { background:#2a9d8f; }
+        .navegacion .btn-enviar:hover:not(:disabled) { background:#21867a; }
+        .navegacion .btn-final { background:#e63946; }
+        .resultado {
+            display: none;
+            margin-top: 25px;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .resultado.exito { background:#e8f5e9; }
+        .resultado.error { background:#ffebee; }
+        .resultado .nota { font-size:2.8rem; font-weight:700; color:#1a1a2e; }
+        .footer { margin-top:30px; text-align:center; font-size:0.85rem; color:#868e96; }
+        #cargando {
+            display: none;
+            text-align:center;
+            margin:15px 0;
+        }
+        .spinner {
+            border:4px solid #f3f3f3;
+            border-top:4px solid #1a1a2e;
+            border-radius:50%;
+            width:36px; height:36px;
+            animation:spin 1s linear infinite;
+            display:inline-block;
+        }
+        @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
+        @media (max-width:600px) {
+            .container { padding:18px; }
+            .header { flex-direction:column; align-items:stretch; }
+            .timer { align-self:flex-start; margin-top:10px; }
+            .alumno-info input { width:100%; }
         }
     </style>
 </head>
 <body>
-<div class="container" id="app">
+<div class="container">
     <div class="header">
-        <h1> Examen (POO)</h1>
+        <h1> Examen POO</h1>
         <div class="timer" id="timerDisplay">30:00</div>
     </div>
 
     <!-- Datos del alumno + grupo + ciclo -->
     <div class="alumno-info">
-        <div>
+        <div class="campo">
             <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre" placeholder="Ej: Pérez López Juan" required>
+            <input type="text" id="nombre" placeholder="Ej: Juan Pérez" required>
         </div>
-        <div>
+        <div class="campo">
             <label for="matricula">Matrícula:</label>
             <input type="text" id="matricula" placeholder="Ej: A12345" required>
         </div>
-        <div>
+        <div class="campo">
             <label for="grupo">Grupo:</label>
-            <input type="text" id="grupo" placeholder="Ej: 6201" required>
+            <input type="text" id="grupo" placeholder="Ej: G101" required>
         </div>
-        <div>
+        <div class="campo">
             <label for="ciclo">Ciclo:</label>
-            <select id="ciclo" required>
-                <option value="">Selecciona...</option>
-                <option value="2026-1">2026-1</option>
-                <option value="2026-2">2026-2</option>
-                <option value="2027-1">2027-1</option>
-                <option value="2027-2">2027-2</option>
-                <option value="2028-1">2028-1</option>
-                <option value="2028-2">2028-2</option>
-            </select>
+            <input type="text" id="ciclo" placeholder="Ej: 2026-1" required>
         </div>
     </div>
 
-    <!-- Barra de progreso -->
+    <!-- Progreso -->
     <div class="progress">
         <span class="counter" id="pregCounter">1 / 50</span>
         <div class="bar"><div class="fill" id="progressFill"></div></div>
         <span id="categoriaLabel" style="font-weight:500; color:#2a9d8f;">Métodos</span>
     </div>
 
-    <!-- Pregunta actual -->
+    <!-- Pregunta -->
     <div class="pregunta-card" id="preguntaCard">
         <div class="enunciado" id="enunciado"></div>
         <div id="codigoContainer" style="display:none;" class="codigo"></div>
@@ -105,13 +233,13 @@
     <div class="navegacion">
         <button id="btnAnterior" disabled>◀ Anterior</button>
         <button id="btnSiguiente" class="btn-enviar">Siguiente ▶</button>
-        <button id="btnEnviar" class="btn-enviar" style="background:#e63946;">📤 Enviar</button>
+        <button id="btnEnviar" class="btn-final">📤 Enviar</button>
     </div>
 
     <div id="cargando"><div class="spinner"></div><p>Guardando resultados...</p></div>
 
     <div id="resultado" class="resultado"></div>
-    <div class="footer">© 2026 Prof Fabián Soberanes Martin</div>
+    <div class="footer">@ 2026 Prof Fabián Soberanes Martín</div>
 </div>
 
 <script>
@@ -122,10 +250,10 @@
     const SUPABASE_KEY = "sb_publishable_zs6LEneJQKH2F0XZ4kFvuQ_OMoORP4R";
 
     // ============================================================
-    // BANCO DE 50 PREGUNTAS (temas: métodos, arreglos, ciclos, condiciones, lógica)
+    // BANCO DE 50 PREGUNTAS (definidas con opciones y correcta como índice)
     // ============================================================
-    const PREGUNTAS = [
-        // --- MÉTODOS ---
+    const PREGUNTAS_BASE = [
+        // Métodos
         {
             categoria: "Métodos",
             enunciado: "Completa el método que calcula el factorial de un número entero:",
@@ -159,9 +287,9 @@
             enunciado: "Completa el método que devuelve el doble de un número:",
             codigo: "int doble(int x) {\n    ______;\n}",
             opciones: ["return x*2;", "return x+2;", "return 2*x;", "return x*2"],
-            correcta: 2  // ambas 0 y 2 son válidas, pero elegimos 0 por claridad
+            correcta: 0
         },
-        // --- ARREGLOS (sin punteros) ---
+        // Arreglos
         {
             categoria: "Arreglos",
             enunciado: "¿Cómo se declara un arreglo de 10 números enteros en C++?",
@@ -197,7 +325,7 @@
             opciones: ["Declara e inicializa un arreglo de 3 enteros", "Declara un arreglo vacío", "Crea un puntero", "Error de compilación"],
             correcta: 0
         },
-        // --- CICLOS ---
+        // Ciclos
         {
             categoria: "Ciclos",
             enunciado: "Completa el bucle para imprimir los números pares del 2 al 20:",
@@ -233,7 +361,7 @@
             opciones: ["i <= 10", "i < 10", "i == 10", "i != 10"],
             correcta: 0
         },
-        // --- CONDICIONES ---
+        // Condiciones
         {
             categoria: "Condiciones",
             enunciado: "Completa la condición para verificar si un número es positivo y par:",
@@ -269,7 +397,7 @@
             opciones: ["c=='a'||c=='e'||c=='i'||c=='o'||c=='u'", "c=='a'&&c=='e'&&...", "c=='a'||'e'||'i'||'o'||'u'", "c==a||e||i||o||u"],
             correcta: 0
         },
-        // --- LÓGICA ALGORÍTMICA ---
+        // Lógica algorítmica
         {
             categoria: "Lógica",
             enunciado: "Completa el algoritmo para encontrar el menor elemento de un arreglo:",
@@ -305,7 +433,7 @@
             opciones: ["b = temp", "temp = b", "b = a", "a = temp"],
             correcta: 0
         },
-        // Más preguntas para llegar a 50 (reutilizo algunas del banco original que cumplen)
+        // Más preguntas (del banco original)
         {
             categoria: "Arreglos",
             enunciado: "Condición para buscar en un arreglo mientras no se pase el tamaño y no se haya encontrado:",
@@ -403,11 +531,8 @@
             codigo: null,
             opciones: ["continue", "break", "return false", "exit"],
             correcta: 0
-        }
-    ];
-
-    // Añadir 6 preguntas extras para llegar a 50
-    const EXTRA = [
+        },
+        // Extras para llegar a 50
         {
             categoria: "Métodos",
             enunciado: "Completa el método que devuelve el área de un rectángulo:",
@@ -452,16 +577,49 @@
         }
     ];
 
-    // Combinar y mezclar
-    function shuffle(arr) {
-        for (let i = arr.length-1; i>0; i--) {
-            const j = Math.floor(Math.random()*(i+1));
+    // ============================================================
+    // FUNCIÓN PARA MEZCLAR OPCIONES Y AJUSTAR LA CORRECTA
+    // ============================================================
+    function shuffleOptions(pregunta) {
+        const opciones = pregunta.opciones.slice();
+        const correctaOriginal = pregunta.correcta;
+        const textoCorrecto = opciones[correctaOriginal];
+        // Mezclar opciones
+        for (let i = opciones.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [opciones[i], opciones[j]] = [opciones[j], opciones[i]];
+        }
+        // Encontrar nuevo índice de la correcta
+        const nuevaCorrecta = opciones.indexOf(textoCorrecto);
+        return {
+            opciones: opciones,
+            correcta: nuevaCorrecta
+        };
+    }
+
+    // ============================================================
+    // PREPARAR PREGUNTAS (mezclar opciones y luego mezclar preguntas)
+    // ============================================================
+    let preguntas = PREGUNTAS_BASE.map(p => {
+        const shuffled = shuffleOptions(p);
+        return {
+            categoria: p.categoria,
+            enunciado: p.enunciado,
+            codigo: p.codigo,
+            opciones: shuffled.opciones,
+            correcta: shuffled.correcta
+        };
+    });
+
+    // Mezclar el orden de las preguntas
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
             [arr[i], arr[j]] = [arr[j], arr[i]];
         }
         return arr;
     }
-    const todas = PREGUNTAS.concat(EXTRA);
-    const preguntas = shuffle(todas); // 50
+    preguntas = shuffleArray(preguntas);
 
     // ============================================================
     // VARIABLES GLOBALES
@@ -469,7 +627,7 @@
     let current = 0;
     const total = preguntas.length;
     const respuestas = new Array(total).fill(null);
-    let tiempoRestante = 3600; // 30 min
+    let tiempoRestante = 1800; // 30 min
     let timerInterval = null;
     let examenFinalizado = false;
 
@@ -526,9 +684,9 @@
     }
 
     function actualizarBotonEnviar() {
-        const todasRespondidas = respuestas.every(r => r !== null);
-        btnEnviar.disabled = !todasRespondidas;
-        btnEnviar.style.opacity = todasRespondidas ? '1' : '0.6';
+        const todas = respuestas.every(r => r !== null);
+        btnEnviar.disabled = !todas;
+        btnEnviar.style.opacity = todas ? '1' : '0.6';
     }
 
     // ============================================================
@@ -553,6 +711,7 @@
     // TEMPORIZADOR
     // ============================================================
     function iniciarTemporizador() {
+        if (timerInterval) clearInterval(timerInterval);
         timerInterval = setInterval(() => {
             tiempoRestante--;
             actualizarTiempo();
@@ -568,11 +727,12 @@
         const mins = Math.floor(tiempoRestante / 60);
         const segs = tiempoRestante % 60;
         timerDisplay.textContent = `${String(mins).padStart(2,'0')}:${String(segs).padStart(2,'0')}`;
-        timerDisplay.classList.toggle('warning', tiempoRestante < 60);
+        if (tiempoRestante < 60) timerDisplay.classList.add('warning');
+        else timerDisplay.classList.remove('warning');
     }
 
     // ============================================================
-    // ENVIAR EXAMEN (incluye grupo y ciclo)
+    // ENVIAR EXAMEN
     // ============================================================
     async function enviarExamen() {
         if (examenFinalizado) return;
@@ -580,27 +740,25 @@
         const nombre = document.getElementById('nombre').value.trim();
         const matricula = document.getElementById('matricula').value.trim();
         const grupo = document.getElementById('grupo').value.trim();
-        const ciclo = document.getElementById('ciclo').value;
+        const ciclo = document.getElementById('ciclo').value.trim();
 
         if (!nombre || !matricula || !grupo || !ciclo) {
-            alert('Por favor, completa todos los datos (nombre, matrícula, grupo y ciclo).');
+            alert('Por favor, completa todos los campos (nombre, matrícula, grupo y ciclo).');
             return;
         }
 
-        const todasRespondidas = respuestas.every(r => r !== null);
-        if (!todasRespondidas) {
+        const todas = respuestas.every(r => r !== null);
+        if (!todas) {
             alert('Aún hay preguntas sin responder. Revisa la barra de progreso.');
             return;
         }
 
-        // Calcular aciertos
         let aciertos = 0;
         for (let i=0; i<total; i++) {
             if (respuestas[i] === preguntas[i].correcta) aciertos++;
         }
         const calificacion = (aciertos / total) * 10;
 
-        // Deshabilitar interfaz
         btnEnviar.disabled = true;
         btnSig.disabled = true;
         btnAnt.disabled = true;
@@ -608,7 +766,7 @@
         resultadoDiv.style.display = 'none';
 
         try {
-            // 1. Obtener o crear alumno
+            // Buscar o crear alumno
             let alumnoId = null;
             const buscarResp = await fetch(`${SUPABASE_URL}/rest/v1/alumnos?matricula=eq.${encodeURIComponent(matricula)}&select=id`, {
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
@@ -628,11 +786,14 @@
                     body: JSON.stringify({ matricula, nombre })
                 });
                 const crearData = await crearResp.json();
-                if (crearData && crearData.length > 0) alumnoId = crearData[0].id;
-                else throw new Error('No se pudo crear el alumno');
+                if (crearData && crearData.length > 0) {
+                    alumnoId = crearData[0].id;
+                } else {
+                    throw new Error('No se pudo crear el alumno');
+                }
             }
 
-            // 2. Guardar resultado (incluye grupo y ciclo)
+            // Guardar resultado con grupo y ciclo
             const resultado = {
                 alumno_id: alumnoId,
                 aciertos: aciertos,
@@ -660,25 +821,24 @@
 
             examenFinalizado = true;
             clearInterval(timerInterval);
-            mostrarResultado(true, nombre, matricula, grupo, ciclo, aciertos, calificacion);
+            mostrarResultado(true, nombre, matricula, aciertos, calificacion);
 
         } catch (error) {
             console.error(error);
-            mostrarResultado(false, nombre, matricula, grupo, ciclo, aciertos, calificacion, error.message);
+            mostrarResultado(false, nombre, matricula, aciertos, calificacion, error.message);
         } finally {
             cargandoDiv.style.display = 'none';
             btnEnviar.disabled = false;
         }
     }
 
-    function mostrarResultado(exito, nombre, matricula, grupo, ciclo, aciertos, calificacion, errorMsg = '') {
+    function mostrarResultado(exito, nombre, matricula, aciertos, calificacion, errorMsg = '') {
         resultadoDiv.style.display = 'block';
-        resultadoDiv.className = 'resultado' + (exito ? '' : ' error');
+        resultadoDiv.className = 'resultado ' + (exito ? 'exito' : 'error');
         if (exito) {
             resultadoDiv.innerHTML = `
                 <h2>🎉 ¡Examen completado!</h2>
                 <p><strong>Alumno:</strong> ${nombre} (${matricula})</p>
-                <p><strong>Grupo:</strong> ${grupo}  |  <strong>Ciclo:</strong> ${ciclo}</p>
                 <p><strong>Aciertos:</strong> ${aciertos} de ${total}</p>
                 <p class="nota">${calificacion.toFixed(2)} / 10</p>
                 <p style="color: green;">✅ Resultados guardados en la nube.</p>
@@ -687,11 +847,10 @@
             resultadoDiv.innerHTML = `
                 <h2>⚠️ Error al guardar</h2>
                 <p><strong>Alumno:</strong> ${nombre} (${matricula})</p>
-                <p><strong>Grupo:</strong> ${grupo}  |  <strong>Ciclo:</strong> ${ciclo}</p>
                 <p><strong>Aciertos:</strong> ${aciertos} de ${total}</p>
                 <p class="nota">${calificacion.toFixed(2)} / 10</p>
                 <p style="color: red;">❌ No se pudieron guardar los resultados: ${errorMsg}</p>
-                <p>Verifica tu conexión a Supabase.</p>
+                <p>Verifica tu conexión y que las columnas 'grupo' y 'ciclo' existan en la tabla resultados.</p>
             `;
         }
         btnAnt.disabled = true;
