@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen de Algoritmos y Programación</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 850px;
+            width:100%;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            padding: 30px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .header h1 { font-size: 1.5rem; color:#1a1a2e; }
+        .timer {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #e63946;
+            background: #f8f9fa;
+            padding: 5px 18px;
+            border-radius: 40px;
+            border: 2px solid #e63946;
+        }
+        .timer.warning { animation: pulse 1s infinite; }
+        @keyframes pulse { 0%{opacity:1;} 50%{opacity:0.5;} }
+        .alumno-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            background: #f8f9fa;
+            padding: 12px 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .alumno-info label { font-weight:600; margin-right:5px; }
+        .alumno-info input, .alumno-info select {
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size:0.95rem;
+            width: 180px;
+        }
+        .alumno-info .campo { display:flex; align-items:center; gap:4px; }
+        .progress {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            font-size:0.95rem;
+        }
+        .progress .counter {
+            background: #e9ecef;
+            padding: 2px 14px;
+            border-radius: 20px;
+            font-weight:600;
+        }
+        .progress .bar {
+            flex:1;
+            height:8px;
+            background:#e9ecef;
+            border-radius:10px;
+        }
+        .progress .bar .fill {
+            height:100%;
+            background:#2a9d8f;
+            border-radius:10px;
+            transition:width 0.3s;
+            width:0%;
+        }
+        .pregunta-card {
+            background: #f8f9fc;
+            border-left: 5px solid #1a1a2e;
+            padding: 20px 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+        .pregunta-card .enunciado {
+            font-size:1.1rem;
+            line-height:1.6;
+            margin-bottom:15px;
+        }
+        .pregunta-card .codigo {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size:0.95rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 12px 0;
+        }
+        .pregunta-card .diagrama {
+            background: #e8f4f8;
+            color: #1a1a2e;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size:0.95rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 12px 0;
+            border: 2px solid #2a9d8f;
+        }
+        .opciones {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .opciones label {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            cursor: pointer;
+            transition:0.2s;
+        }
+        .opciones label:hover { background:#e9ecef; border-color:#adb5bd; }
+        .opciones input[type="radio"] {
+            margin-right:12px;
+            width:18px; height:18px;
+            accent-color:#1a1a2e;
+        }
+        .navegacion {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap:10px;
+            margin-top: 20px;
+        }
+        .navegacion button {
+            background: #1a1a2e;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size:1rem;
+            cursor:pointer;
+            transition:0.2s;
+        }
+        .navegacion button:hover:not(:disabled) { background:#0f3460; }
+        .navegacion button:disabled { background:#adb5bd; cursor:not-allowed; }
+        .navegacion .btn-enviar { background:#2a9d8f; }
+        .navegacion .btn-enviar:hover:not(:disabled) { background:#21867a; }
+        .navegacion .btn-final { background:#e63946; }
+        .resultado {
+            display: none;
+            margin-top: 25px;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .resultado.exito { background:#e8f5e9; }
+        .resultado.error { background:#ffebee; }
+        .resultado .nota { font-size:2.8rem; font-weight:700; color:#1a1a2e; }
+        .footer { margin-top:30px; text-align:center; font-size:0.85rem; color:#868e96; }
+        #cargando {
+            display: none;
+            text-align:center;
+            margin:15px 0;
+        }
+        .spinner {
+            border:4px solid #f3f3f3;
+            border-top:4px solid #1a1a2e;
+            border-radius:50%;
+            width:36px; height:36px;
+            animation:spin 1s linear infinite;
+            display:inline-block;
+        }
+        @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
+        @media (max-width:600px) {
+            .container { padding:18px; }
+            .header { flex-direction:column; align-items:stretch; }
+            .timer { align-self:flex-start; margin-top:10px; }
+            .alumno-info input { width:100%; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Examen de Algoritmos y Programación</h1>
+        <div class="timer" id="timerDisplay">60:00</div>
+    </div>
+
+    <!-- Datos del alumno + grupo + ciclo -->
+    <div class="alumno-info">
+        <div class="campo">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" placeholder="Ej: Pérez López Juan" required>
+        </div>
+        <div class="campo">
+            <label for="matricula">Matrícula:</label>
+            <input type="text" id="matricula" placeholder="Ej: 20240001" required>
+        </div>
+        <div class="campo">
+            <label for="grupo">Grupo:</label>
+            <input type="text" id="grupo" placeholder="Ej: 6201" required>
+        </div>
+        <div class="campo">
+            <label for="ciclo">Ciclo:</label>
+            <select id="ciclo" required>
+                <option value="">Selecciona...</option>
+                <option value="2026-1">2026-1</option>
+                <option value="2026-2">2026-2</option>
+                <option value="2027-1">2027-1</option>
+                <option value="2027-2">2027-2</option>
+                <option value="2028-1">2028-1</option>
+                <option value="2028-2">2028-2</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Progreso -->
+    <div class="progress">
+        <span class="counter" id="pregCounter">1 / 50</span>
+        <div class="bar"><div class="fill" id="progressFill"></div></div>
+        <span id="categoriaLabel" style="font-weight:500; color:#2a9d8f;">General</span>
+    </div>
+
+    <!-- Pregunta -->
+    <div class="pregunta-card" id="preguntaCard">
+        <div class="enunciado" id="enunciado"></div>
+        <div id="codigoContainer" style="display:none;" class="codigo"></div>
+        <div id="diagramaContainer" style="display:none;" class="diagrama"></div>
+        <div class="opciones" id="opcionesContainer"></div>
+    </div>
+
+    <!-- Navegación -->
+    <div class="navegacion">
+        <button id="btnAnterior" disabled>◀ Anterior</button>
+        <button id="btnSiguiente" class="btn-enviar">Siguiente ▶</button>
+        <button id="btnEnviar" class="btn-final">📤 Enviar</button>
+    </div>
+
+    <div id="cargando"><div class="spinner"></div><p>Guardando resultados...</p></div>
+
+    <div id="resultado" class="resultado"></div>
+    <div class="footer">@ 2026 Prof. Fabián Soberanes Martín</div>
+</div>
+
+<script>
+    // ============================================================
+    // CONFIGURACIÓN SUPABASE
+    // ============================================================
+    const SUPABASE_URL = "https://etucngqlvlcwmdspbkdv.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_zs6LEneJQKH2F0XZ4kFvuQ_OMoORP4R";
+
+    // ============================================================
+    // BANCO DE 50 PREGUNTAS
+    // ============================================================
+    const PREGUNTAS_BASE = [
+        // ========== DIAGRAMAS DE FLUJO (10 preguntas) ==========
+        {
+            categoria: "Diagramas de Flujo",
+            enunciado: "¿Qué símbolo se utiliza en un diagrama de flujo para representar el inicio o fin de un algoritmo?",
+            codigo: null,
+            diagrama: null,
+            opciones: ["Óvalo", "Rectángulo", "Rombo", "Paralelogramo"],
+            correcta: 0
+        },
+        {
+            categoria: "Diagramas de Flujo",
+            enunciado: "En un diagrama de flujo, ¿qué símbolo representa una decisión o condición?",
+            codigo: null,
+            diagrama: null,
+            opciones: ["Rombo", "Rectángulo", "Círculo", "Flecha"],
+            correcta: 0
+        },
+        {
+            categoria: "Diagramas de Flujo",
+            enunciado: "¿Qué símbolo representa una operación de entrada o salida de datos?",
+            codigo: null,
+            diagrama: null,
+            opciones: ["Paralelogramo", "Rectángulo", "Óvalo", "Hexágono"],
+            correcta: 0
+        },
+        {
+            categoria: "Diagramas de Flujo",
+            enunciado: "Dado el siguiente diagrama de flujo, ¿cuál es el resultado final si N = 5?",
+            diagrama: "INICIO → [Leer N] → [Suma = 0] → [i = 1]\n  ↓\n¿i <= N? → NO → [Escribir Suma] → FIN\n  ↓ SI\n[Suma = Suma + i]\n[i = i + 1]\n  ↓ (regresa a ¿i <= N?)",
+            opciones: ["15", "10", "5", "0"],
+            correcta: 0
+        },
+        {
+            categoria: "Diagramas de Flujo",
+            enunciado: "En un diagrama de flujo, ¿qué estructura representa el siguiente patrón: una decisión que puede repetirse varias veces?",
+            codigo: null,
+            diagrama: null,
+            opciones: ["Ciclo/Loop", "Secuencia", "Condicional simple", "Subrutina"],
+            correcta: 0
+        },
+        {
+            categoria: "Diagramas de Flujo",
+            enunciado: "Dado el siguiente diagrama, ¿qué hace este algoritmo?",
+            diagrama: "INICIO → [Leer A, B] → ¿A > B? → SI → [C = A]\n                      ↓ NO\n                   [C = B]\n                      ↓\n              [Escribir C] → FIN",
+            opciones: ["Encuentra el mayor de dos números", "Suma dos números", "Resta B de A", "Intercambia A y B"],
+            correcta: 0
+        },
+        {
+            categoria: "Diagramas de Flujo",
+            enunciado: "¿Qué símbolo se usa para representar un proceso o cálculo en un diagrama de flujo?",
+            codigo: null,
+            diagrama: null,
+            opciones: ["Rectángulo", "Rombo", "Óvalo", "Paralelogramo"],
+            correcta: 0
+        },
+        {
+            categoria: "Diagramas de Flujo",
+            enunciado: "Dado el diagrama, si el usuario ingresa N = 3, ¿cuántas veces se ejecuta el proceso dentro del ciclo?",
+            diagrama: "INICIO → [Leer N] → [i = 1]\n  ↓\n¿i <= N? → NO → FIN\n  ↓ SI\n[Proceso]\n[i = i + 1]\n  ↓ (regresa)",
+            opciones: ["3 veces", "2 veces", "4 veces", "Nunca"],
+            correcta: 0
+        },
+        {
+            categoria: "Diagramas de Flujo",
+            enunciado: "¿Qué tipo de estructura de control representa un rombo con dos salidas (Sí/No)?",
+            codigo: null,
+            diagrama: null,
+            opciones: ["Estructura condicional", "Estructura secuencial", "Estructura iterativa", "Estructura de arreglos"],
+            correcta: 0
+        },
+        {
+            categoria: "Diagramas de Flujo",
+            enunciado: "En un diagrama de flujo, las flechas entre símbolos representan:",
+            codigo: null,
+            diagrama: null,
+            opciones: ["El flujo de ejecución del algoritmo", "Errores en el programa", "Variables del sistema", "Comentarios del código"],
+            correcta: 0
+        },
+
+        // ========== PSEUDOCÓDIGO (10 preguntas) ==========
+        {
+            categoria: "Pseudocódigo",
+            enunciado: "¿Qué hace el siguiente pseudocódigo?",
+            codigo: "Inicio\n  Leer numero\n  Si numero mod 2 = 0 Entonces\n    Escribir \"Par\"\n  Sino\n    Escribir \"Impar\"\n  Fin Si\nFin",
+            opciones: ["Determina si un número es par o impar", "Calcula el factorial", "Suma los dígitos", "Encuentra el mayor número"],
+            correcta: 0
+        },
+        {
+            categoria: "Pseudocódigo",
+            enunciado: "En pseudocódigo, ¿qué estructura se usa para repetir un bloque mientras una condición sea verdadera?",
+            codigo: null,
+            opciones: ["Mientras ... Hacer", "Si ... Entonces", "Para ... Hasta", "Caso ... De"],
+            correcta: 0
+        },
+        {
+            categoria: "Pseudocódigo",
+            enunciado: "¿Cuál es la salida del siguiente pseudocódigo?",
+            codigo: "Inicio\n  suma = 0\n  Para i = 1 Hasta 4 Hacer\n    suma = suma + i\n  Fin Para\n  Escribir suma\nFin",
+            opciones: ["10", "4", "6", "0"],
+            correcta: 0
+        },
+        {
+            categoria: "Pseudocódigo",
+            enunciado: "¿Qué hace el siguiente pseudocódigo?",
+            codigo: "Inicio\n  mayor = 0\n  Para i = 1 Hasta 5 Hacer\n    Leer num\n    Si num > mayor Entonces\n      mayor = num\n    Fin Si\n  Fin Para\n  Escribir mayor\nFin",
+            opciones: ["Encuentra el número mayor de 5 números ingresados", "Suma 5 números", "Calcula el promedio", "Cuenta números pares"],
+            correcta: 0
+        },
+        {
+            categoria: "Pseudocódigo",
+            enunciado: "En pseudocódigo, ¿cómo se representa correctamente una estructura condicional anidada?",
+            codigo: null,
+            opciones: ["Si ... Entonces ... Si ... Entonces ... Fin Si ... Fin Si", "Si ... Si ... Fin", "Si ... Entonces ... Sino ... Sino ... Fin", "Condición ... Entonces ... Fin"],
+            correcta: 0
+        },
+        {
+            categoria: "Pseudocódigo",
+            enunciado: "¿Cuál es la salida del siguiente pseudocódigo?",
+            codigo: "Inicio\n  x = 10\n  y = 3\n  z = x div y\n  Escribir z\nFin",
+            opciones: ["3", "3.33", "1", "30"],
+            correcta: 0
+        },
+        {
+            categoria: "Pseudocódigo",
+            enunciado: "¿Qué hace el siguiente pseudocódigo?",
+            codigo: "Inicio\n  contador = 0\n  Mientras contador < 5 Hacer\n    Escribir contador\n    contador = contador + 1\n  Fin Mientras\nFin",
+            opciones: ["Imprime los números del 0 al 4", "Imprime del 1 al 5", "Imprime 5 veces el 0", "Entra en un ciclo infinito"],
+            correcta: 0
+        },
+        {
+            categoria: "Pseudocódigo",
+            enunciado: "En pseudocódigo, ¿qué palabra clave se usa para definir el final de un algoritmo?",
+            codigo: null,
+            opciones: ["Fin", "End", "Stop", "Terminate"],
+            correcta: 0
+        },
+        {
+            categoria: "Pseudocódigo",
+            enunciado: "¿Cuál es la salida del siguiente pseudocódigo?",
+            codigo: "Inicio\n  a = 5\n  b = 2\n  c = a ^ b\n  Escribir c\nFin",
+            opciones: ["25", "7", "10", "32"],
+            correcta: 0
+        },
+        {
+            categoria: "Pseudocódigo",
+            enunciado: "¿Qué hace el siguiente pseudocódigo?",
+            codigo: "Inicio\n  n = 5\n  factorial = 1\n  Mientras n > 0 Hacer\n    factorial = factorial * n\n    n = n - 1\n  Fin Mientras\n  Escribir factorial\nFin",
+            opciones: ["Calcula el factorial de 5", "Suma los números del 1 al 5", "Calcula 5 elevado a la 5", "Cuenta hasta 5"],
+            correcta: 0
+        },
+
+        // ========== SEGMENTOS DE CÓDIGO C++ (15 preguntas) ==========
+        {
+            categoria: "Código C++",
+            enunciado: "¿Qué hace el siguiente segmento de código en C++?",
+            codigo: "int suma = 0;\nfor (int i = 1; i <= 10; i++) {\n    suma += i;\n}\ncout << suma;",
+            opciones: ["Calcula la suma de los números del 1 al 10", "Imprime los números del 1 al 10", "Cuenta cuántos números hay del 1 al 10", "Calcula el factorial de 10"],
+            correcta: 0
+        },
+        {
+            categoria: "Código C++",
+            enunciado: "¿Cuál es la salida del siguiente código?",
+            codigo: "int x = 5;\nint y = 2;\ncout << x / y;",
+            opciones: ["2", "2.5", "3", "0"],
+            correcta: 0
+        },
+        {
+            categoria: "Código C++",
+            enunciado: "¿Qué hace el siguiente segmento de código?",
+            codigo: "int arr[] = {3, 1, 4, 1, 5};\nint max = arr[0];\nfor (int i = 1; i < 5; i++) {\n    if (arr[i] > max) max = arr[i];\n}\ncout << max;",
+            opciones: ["Encuentra el valor máximo del arreglo", "Suma todos los elementos", "Ordena el arreglo", "Cuenta los elementos"],
+            correcta: 0
+        },
+        {
+            categoria: "Código C++",
+            enunciado: "¿Cuál es la salida del siguiente código?",
+            codigo: "for (int i = 0; i < 3; i++) {\n    for (int j = 0; j < 2; j++) {\n        cout << \"*\";\n    }\n    cout << endl;\n}",
+            opciones: ["Imprime 6 asteriscos en 3 filas de 2", "Imprime 2 asteriscos", "Imprime 3 asteriscos", "Error de compilación"],
+            correcta: 0
+        },
+        {
+            categoria: "Código C++",
+            enunciado: "¿Qué hace el siguiente segmento de código?",
+            codigo: "int n = 123;\nint suma = 0;\nwhile (n > 0) {\n    suma += n % 10;\n    n /= 10;\n}\ncout << suma;",
+            opciones: ["Suma los dígitos de un número", "Invierte el número", "Cuenta los dígitos", "Calcula el factorial"],
+            correcta: 0
+        },
+        {
+            categoria: "Código C++",
+            enunciado: "¿Cuál es la salida del siguiente código?",
+            codigo: "int a = 5;\nint b = ++a;\ncout << a << \" \" << b;",
+            opciones: ["6 6", "5 6", "6 5", "5 5"],
+            correcta: 0
+        },
+        {
+            categoria: "Código C++",
+            enunciado: "¿Qué hace el siguiente segmento de código?",
+            codigo: "bool esPrimo(int n) {\n    if (n < 2) return false;\n    for (int i = 2; i * i <= n; i++) {\n        if (n % i == 0) return false;\n    }\n    return true;\n}",
+            opciones: ["Verifica si un número es primo", "Calcula la raíz cuadrada", "Encuentra divisores", "Calcula potencias"],
+            correcta: 0
+        },
+        {
+            categoria: "Código C++",
+            enunciado: "¿Cuál es la salida del siguiente código?",
+            codigo: "int x = 10;\nif (x > 5)\n    if (x > 15)\n        cout << \"A\";\n    else\n        cout << \"B\";\nelse\n    cout << \"C\";",
+            opciones: ["B", "A", "C", "Error"],
+            correcta: 0
+        },
+        {
+            categoria: "Código C++",
+            enunciado: "¿Qué hace el siguiente segmento de código?",
+            codigo: "int arr[5] = {1, 2, 3, 4, 5};\nfor (int i = 0; i < 5 / 2; i++) {\n    int temp = arr[i];\n    arr[i] = arr[4 - i];\n    arr[4 - i] = temp;\n}",
+            opciones: ["Invierte el orden del arreglo", "Ordena el arreglo ascendente", "Suma los elementos", "Encuentra el máximo"],
+            correcta: 0
+        },
+        {
+            categoria: "Código C++",
+            enunciado: "¿Cuál es la salida del siguiente código?",
+            codigo: "int i = 0;\ndo {\n    cout << i << \" \";\n    i++;\n} while (i < 3);",
+            opciones: ["0 1 2", "1 2 3", "0 1 2 3", "Error"],
+            correcta: 0
+        },
+        {
+            categoria: "Código C++",
+            enunciado: "¿Qué hace el siguiente segmento de código?",
+            codigo: "int fib(int n) {\n    if (n <= 1) return n;\n    return fib(n-1) + fib(n-2);\n}",
+            opciones: ["Calcula el n-ésimo número de Fibonacci", "Calcula el factorial", "Suma números recursivamente", "Encuentra el máximo"],
+            correcta: 0
+        },
+        {
+            categoria: "Código C++",
+            enunciado: "¿Cuál es la salida del siguiente código?",
+            codigo: "int a = 5, b = 10;\na = a + b;\nb = a - b;\na = a - b;\ncout << a << \" \" << b;",
+            opciones: ["10 5", "5 10", "15 5", "Error"],
+            correcta: 0
+        },
+        {
+            categoria: "Código C++",
+            enunciado: "¿Qué hace el siguiente segmento de código?",
+            codigo: "int n = 5;\nfor (int i = 1; i <= n; i++) {\n    for (int j = 1; j <= i; j++) {\n        cout << \"*\";\n    }\n    cout << endl;\n}",
+            opciones: ["Imprime un triángulo de asteriscos", "Imprime un cuadrado", "Imprime una pirámide invertida", "Imprime números"],
+            correcta: 0
+        },
+        {
+            categoria: "Código C++",
+            enunciado: "¿Cuál es la salida del siguiente código?",
+            codigo: "int x = 5;\nint y = x++ + ++x;\ncout << y;",
+            opciones: ["12", "10", "11", "Error"],
+            correcta: 0
+        },
+        {
+            categoria: "Código C++",
+            enunciado: "¿Qué hace el siguiente segmento de código?",
+            codigo: "string s = \"Hola\";\nfor (int i = s.length() - 1; i >= 0; i--) {\n    cout << s[i];\n}",
+            opciones: ["Imprime la cadena al revés", "Imprime la longitud", "Cuenta las vocales", "Convierte a mayúsculas"],
+            correcta: 0
+        },
+
+        // ========== MÉTODOS (5 preguntas) ==========
+        {
+            categoria: "Métodos",
+            enunciado: "Completa el método que calcula el factorial de un número entero:",
+            codigo: "int factorial(int n) {\n    if (n <= 1) return 1;\n    return ______;\n}",
+            opciones: ["n * factorial(n-1)", "n * (n-1)", "n + factorial(n-1)", "factorial(n-1)"],
+            correcta: 0
+        },
+        {
+            categoria: "Métodos",
+            enunciado: "¿Cuál es la firma correcta de un método que devuelve el mayor de dos enteros?",
+            codigo: null,
+            opciones: ["int max(int a, int b)", "void max(int a, int b)", "int max(int a, int b, int c)", "float max(int a, int b)"],
+            correcta: 0
+        },
+        {
+            categoria: "Métodos",
+            enunciado: "Completa el método para sumar los elementos de un arreglo de enteros:",
+            codigo: "int sumarArreglo(int arr[], int tam) {\n    int s = 0;\n    for (int i=0; i<tam; i++) {\n        ______;\n    }\n    return s;\n}",
+            opciones: ["s += arr[i]", "s = arr[i]", "s += i", "s = s + i"],
+            correcta: 0
+        },
+        {
+            categoria: "Métodos",
+            enunciado: "¿Qué palabra clave se usa para que un método no devuelva ningún valor?",
+            codigo: null,
+            opciones: ["void", "null", "return", "empty"],
+            correcta: 0
+        },
+        {
+            categoria: "Métodos",
+            enunciado: "Completa el método que devuelve true si el número es par:",
+            codigo: "bool esPar(int n) {\n    ______;\n}",
+            opciones: ["return n % 2 == 0;", "return n / 2 == 0;", "return n % 2 != 0;", "return n == 0;"],
+            correcta: 0
+        },
+
+        // ========== ARREGLOS (5 preguntas) ==========
+        {
+            categoria: "Arreglos",
+            enunciado: "¿Cómo se declara un arreglo de 10 números enteros en C++?",
+            codigo: null,
+            opciones: ["int numeros[10];", "int numeros[];", "int numeros(10);", "array<int,10> numeros;"],
+            correcta: 0
+        },
+        {
+            categoria: "Arreglos",
+            enunciado: "¿Cuál es el índice del último elemento de un arreglo 'vector' de tamaño 25?",
+            codigo: null,
+            opciones: ["24", "25", "0", "26"],
+            correcta: 0
+        },
+        {
+            categoria: "Arreglos",
+            enunciado: "Completa el código para encontrar el valor máximo en un arreglo:",
+            codigo: "int max = arr[0];\nfor (int i=1; i<n; i++) {\n    if (______) max = arr[i];\n}",
+            opciones: ["arr[i] > max", "arr[i] < max", "i > max", "arr[i] >= max"],
+            correcta: 0
+        },
+        {
+            categoria: "Arreglos",
+            enunciado: "¿Qué hace el siguiente fragmento? int a[] = {1,2,3};",
+            codigo: null,
+            opciones: ["Declara e inicializa un arreglo de 3 enteros", "Declara un arreglo vacío", "Crea un puntero", "Error de compilación"],
+            correcta: 0
+        },
+        {
+            categoria: "Arreglos",
+            enunciado: "¿Cómo se accede al tercer elemento de un arreglo 'nums'?",
+            codigo: null,
+            opciones: ["nums[2]", "nums[3]", "nums[0]", "nums[1]"],
+            correcta: 0
+        },
+
+        // ========== CICLOS (5 preguntas) ==========
+        {
+            categoria: "Ciclos",
+            enunciado: "Completa el bucle para imprimir los números pares del 2 al 20:",
+            codigo: "for (int i=2; i<=20; ______) {\n    cout << i << \" \";\n}",
+            opciones: ["i+=2", "i++", "i+2", "i=i+1"],
+            correcta: 0
+        },
+        {
+            categoria: "Ciclos",
+            enunciado: "¿Cuántas veces se ejecutará el cuerpo de este bucle? while (i < 5) { i++; }",
+            codigo: null,
+            opciones: ["Depende del valor inicial de i", "5", "4", "6"],
+            correcta: 0
+        },
+        {
+            categoria: "Ciclos",
+            enunciado: "Completa el ciclo for para recorrer un arreglo 'arr' de tamaño 'tam' en orden inverso:",
+            codigo: "for (int i = tam-1; ______; i--) {\n    // procesar arr[i]\n}",
+            opciones: ["i >= 0", "i > 0", "i < tam", "i == 0"],
+            correcta: 0
+        },
+        {
+            categoria: "Ciclos",
+            enunciado: "¿Qué palabra clave se usa para saltar a la siguiente iteración de un ciclo?",
+            codigo: null,
+            opciones: ["continue", "break", "return", "exit"],
+            correcta: 0
+        },
+        {
+            categoria: "Ciclos",
+            enunciado: "¿Cuál es la salida de este bucle? for(int i=0;i<3;i++) cout<<i;",
+            codigo: null,
+            opciones: ["012", "123", "0 1 2", "Error"],
+            correcta: 0
+        }
+    ];
+
+    // ============================================================
+    // FUNCIÓN PARA MEZCLAR OPCIONES Y AJUSTAR LA CORRECTA
+    // ============================================================
+    function shuffleOptions(pregunta) {
+        const opciones = pregunta.opciones.slice();
+        const correctaOriginal = pregunta.correcta;
+        const textoCorrecto = opciones[correctaOriginal];
+        // Mezclar opciones
+        for (let i = opciones.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [opciones[i], opciones[j]] = [opciones[j], opciones[i]];
+        }
+        // Encontrar nuevo índice de la correcta
+        const nuevaCorrecta = opciones.indexOf(textoCorrecto);
+        return {
+            opciones: opciones,
+            correcta: nuevaCorrecta
+        };
+    }
+
+    // ============================================================
+    // PREPARAR PREGUNTAS (mezclar opciones y luego mezclar preguntas)
+    // ============================================================
+    let preguntas = PREGUNTAS_BASE.map(p => {
+        const shuffled = shuffleOptions(p);
+        return {
+            categoria: p.categoria,
+            enunciado: p.enunciado,
+            codigo: p.codigo,
+            diagrama: p.diagrama,
+            opciones: shuffled.opciones,
+            correcta: shuffled.correcta
+        };
+    });
+
+    // Mezclar el orden de las preguntas
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+    preguntas = shuffleArray(preguntas);
+
+    // ============================================================
+    // VARIABLES GLOBALES
+    // ============================================================
+    let current = 0;
+    const total = preguntas.length;
+    const respuestas = new Array(total).fill(null);
+    let tiempoRestante = 3600; // 60 minutos
+    let timerInterval = null;
+    let examenFinalizado = false;
+
+    const btnAnt = document.getElementById('btnAnterior');
+    const btnSig = document.getElementById('btnSiguiente');
+    const btnEnviar = document.getElementById('btnEnviar');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const progressFill = document.getElementById('progressFill');
+    const pregCounter = document.getElementById('pregCounter');
+    const categoriaLabel = document.getElementById('categoriaLabel');
+    const enunciadoDiv = document.getElementById('enunciado');
+    const codigoDiv = document.getElementById('codigoContainer');
+    const diagramaDiv = document.getElementById('diagramaContainer');
+    const opcionesDiv = document.getElementById('opcionesContainer');
+    const resultadoDiv = document.getElementById('resultado');
+    const cargandoDiv = document.getElementById('cargando');
+
+    // ============================================================
+    // RENDERIZADO
+    // ============================================================
+    function renderPregunta(index) {
+        const p = preguntas[index];
+        enunciadoDiv.textContent = p.enunciado;
+        
+        if (p.codigo) {
+            codigoDiv.style.display = 'block';
+            codigoDiv.textContent = p.codigo;
+        } else {
+            codigoDiv.style.display = 'none';
+        }
+        
+        if (p.diagrama) {
+            diagramaDiv.style.display = 'block';
+            diagramaDiv.textContent = p.diagrama;
+        } else {
+            diagramaDiv.style.display = 'none';
+        }
+        
+        opcionesDiv.innerHTML = '';
+        p.opciones.forEach((texto, i) => {
+            const label = document.createElement('label');
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = 'pregunta';
+            radio.value = i;
+            if (respuestas[index] === i) radio.checked = true;
+            radio.addEventListener('change', () => {
+                respuestas[index] = i;
+                actualizarBotonEnviar();
+            });
+            label.appendChild(radio);
+            label.appendChild(document.createTextNode(' ' + texto));
+            opcionesDiv.appendChild(label);
+        });
+
+        pregCounter.textContent = `${index+1} / ${total}`;
+        const pct = ((index+1) / total) * 100;
+        progressFill.style.width = pct + '%';
+        categoriaLabel.textContent = p.categoria || 'General';
+
+        btnAnt.disabled = (index === 0);
+        btnSig.textContent = (index === total-1) ? '📤 Finalizar' : 'Siguiente ▶';
+        actualizarBotonEnviar();
+    }
+
+    function actualizarBotonEnviar() {
+        const todas = respuestas.every(r => r !== null);
+        btnEnviar.disabled = !todas;
+        btnEnviar.style.opacity = todas ? '1' : '0.6';
+    }
+
+    // ============================================================
+    // NAVEGACIÓN
+    // ============================================================
+    function irAPregunta(index) {
+        if (index < 0 || index >= total || examenFinalizado) return;
+        current = index;
+        renderPregunta(current);
+    }
+
+    btnAnt.addEventListener('click', () => irAPregunta(current-1));
+    btnSig.addEventListener('click', () => {
+        if (current === total-1) {
+            enviarExamen();
+        } else {
+            irAPregunta(current+1);
+        }
+    });
+
+    // ============================================================
+    // TEMPORIZADOR
+    // ============================================================
+    function iniciarTemporizador() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            tiempoRestante--;
+            actualizarTiempo();
+            if (tiempoRestante <= 0) {
+                clearInterval(timerInterval);
+                alert('⏰ Tiempo agotado. El examen se enviará automáticamente.');
+                enviarExamen();
+            }
+        }, 1000);
+    }
+
+    function actualizarTiempo() {
+        const mins = Math.floor(tiempoRestante / 60);
+        const segs = tiempoRestante % 60;
+        timerDisplay.textContent = `${String(mins).padStart(2,'0')}:${String(segs).padStart(2,'0')}`;
+        if (tiempoRestante < 300) timerDisplay.classList.add('warning');
+        else timerDisplay.classList.remove('warning');
+    }
+
+    // ============================================================
+    // ENVIAR EXAMEN
+    // ============================================================
+    async function enviarExamen() {
+        if (examenFinalizado) return;
+
+        const nombre = document.getElementById('nombre').value.trim();
+        const matricula = document.getElementById('matricula').value.trim();
+        const grupo = document.getElementById('grupo').value.trim();
+        const ciclo = document.getElementById('ciclo').value.trim();
+
+        if (!nombre || !matricula || !grupo || !ciclo) {
+            alert('Por favor, completa todos los campos (nombre, matrícula, grupo y ciclo).');
+            return;
+        }
+
+        const todas = respuestas.every(r => r !== null);
+        if (!todas) {
+            alert('Aún hay preguntas sin responder. Revisa la barra de progreso.');
+            return;
+        }
+
+        let aciertos = 0;
+        for (let i=0; i<total; i++) {
+            if (respuestas[i] === preguntas[i].correcta) aciertos++;
+        }
+        const calificacion = (aciertos / total) * 10;
+
+        btnEnviar.disabled = true;
+        btnSig.disabled = true;
+        btnAnt.disabled = true;
+        cargandoDiv.style.display = 'block';
+        resultadoDiv.style.display = 'none';
+
+        try {
+            // Buscar o crear alumno
+            let alumnoId = null;
+            const buscarResp = await fetch(`${SUPABASE_URL}/rest/v1/alumnos?matricula=eq.${encodeURIComponent(matricula)}&select=id`, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            const buscarData = await buscarResp.json();
+            if (buscarData && buscarData.length > 0) {
+                alumnoId = buscarData[0].id;
+            } else {
+                const crearResp = await fetch(`${SUPABASE_URL}/rest/v1/alumnos`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify({ matricula, nombre })
+                });
+                const crearData = await crearResp.json();
+                if (crearData && crearData.length > 0) {
+                    alumnoId = crearData[0].id;
+                } else {
+                    throw new Error('No se pudo crear el alumno');
+                }
+            }
+
+            // Guardar resultado con grupo y ciclo
+            const resultado = {
+                alumno_id: alumnoId,
+                aciertos: aciertos,
+                total_preguntas: total,
+                calificacion: parseFloat(calificacion.toFixed(2)),
+                fecha_hora: new Date().toISOString(),
+                grupo: grupo,
+                ciclo: ciclo
+            };
+
+            const insertResp = await fetch(`${SUPABASE_URL}/rest/v1/resultados`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                },
+                body: JSON.stringify(resultado)
+            });
+
+            if (!insertResp.ok) {
+                const errorText = await insertResp.text();
+                throw new Error(`Error al guardar: ${errorText}`);
+            }
+
+            examenFinalizado = true;
+            clearInterval(timerInterval);
+            mostrarResultado(true, nombre, matricula, aciertos, calificacion);
+
+        } catch (error) {
+            console.error(error);
+            mostrarResultado(false, nombre, matricula, aciertos, calificacion, error.message);
+        } finally {
+            cargandoDiv.style.display = 'none';
+            btnEnviar.disabled = false;
+        }
+    }
+
+    function mostrarResultado(exito, nombre, matricula, aciertos, calificacion, errorMsg = '') {
+        resultadoDiv.style.display = 'block';
+        resultadoDiv.className = 'resultado ' + (exito ? 'exito' : 'error');
+        if (exito) {
+            resultadoDiv.innerHTML = `
+                <h2>¡Examen completado!</h2>
+                <p><strong>Alumno:</strong> ${nombre} (${matricula})</p>
+                <p><strong>Aciertos:</strong> ${aciertos} de ${total}</p>
+                <p class="nota">${calificacion.toFixed(2)} / 10</p>
+                <p style="color: green;">✅ Resultados guardados.</p>
+            `;
+        } else {
+            resultadoDiv.innerHTML = `
+                <h2>⚠️ Error al guardar</h2>
+                <p><strong>Alumno:</strong> ${nombre} (${matricula})</p>
+                <p><strong>Aciertos:</strong> ${aciertos} de ${total}</p>
+                <p class="nota">${calificacion.toFixed(2)} / 10</p>
+                <p style="color: red;">❌ No se pudieron guardar los resultados: ${errorMsg}</p>
+                <p>Verifica tu conexión y que las columnas 'grupo' y 'ciclo' existan en la tabla resultados.</p>
+            `;
+        }
+        btnAnt.disabled = true;
+        btnSig.disabled = true;
+        btnEnviar.disabled = true;
+    }
+
+    // ============================================================
+    // INICIALIZACIÓN
+    // ============================================================
+    window.onload = function() {
+        renderPregunta(0);
+        iniciarTemporizador();
+        actualizarBotonEnviar();
+        btnEnviar.addEventListener('click', enviarExamen);
+    };
+</script>
+</body>
+</html>
