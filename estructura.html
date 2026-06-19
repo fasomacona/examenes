@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Examen de Estructuras de Datos</title>
+    <title>Examen de Estructuras de Datos - Ordenamiento y Grafos</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -187,6 +187,7 @@
             .alumno-info input { width:100%; }
         }
     </style>
+<base target="_blank">
 </head>
 <body>
 <div class="container">
@@ -223,7 +224,7 @@
     </div>
 
     <div class="progress">
-        <span class="counter" id="pregCounter">1 / 50</span>
+        <span class="counter" id="pregCounter">1 / 30</span>
         <div class="bar"><div class="fill" id="progressFill"></div></div>
         <span id="categoriaLabel" style="font-weight:500; color:#2a9d8f;">General</span>
     </div>
@@ -251,227 +252,17 @@
     const SUPABASE_KEY = "sb_publishable_zs6LEneJQKH2F0XZ4kFvuQ_OMoORP4R";
 
     const PREGUNTAS_BASE = [
-        // ========== PILAS (10) ==========
-        {
-            categoria: "Pilas",
-            enunciado: "¿Qué principio sigue una estructura de datos tipo Pila (Stack)?",
-            codigo: null,
-            opciones: ["LIFO (Last In, First Out)", "FIFO (First In, First Out)", "LILO (Last In, Last Out)", "FILO (First In, Last Out)"],
-            correcta: 0
-        },
-        {
-            categoria: "Pilas",
-            enunciado: "¿Qué hace el siguiente código sobre una pila implementada con un arreglo?",
-            codigo: "void push(int dato) {\n    if (tope < MAX - 1) {\n        tope++;\n        arr[tope] = dato;\n    }\n}",
-            opciones: ["Inserta un elemento en la cima de la pila", "Elimina el elemento de la cima", "Consulta el elemento de la cima", "Verifica si la pila está vacía"],
-            correcta: 0
-        },
-        {
-            categoria: "Pilas",
-            enunciado: "¿Cuál es la operación que elimina el elemento de la cima de una pila?",
-            codigo: null,
-            opciones: ["pop()", "push()", "peek() / top()", "isEmpty()"],
-            correcta: 0
-        },
-        {
-            categoria: "Pilas",
-            enunciado: "Dado el siguiente código, ¿qué valor devuelve peek() después de ejecutar todas las operaciones?",
-            codigo: "stack<int> p;\np.push(10);\np.push(20);\np.push(30);\np.pop();\ncout << p.top();",
-            opciones: ["20", "30", "10", "Error"],
-            correcta: 0
-        },
-        {
-            categoria: "Pilas",
-            enunciado: "¿Qué hace el siguiente código?",
-            codigo: "bool estaVacia() {\n    return tope == -1;\n}",
-            opciones: ["Verifica si la pila está vacía", "Verifica si la pila está llena", "Devuelve el tamaño de la pila", "Elimina todos los elementos"],
-            correcta: 0
-        },
-        {
-            categoria: "Pilas",
-            enunciado: "¿Cuál es la complejidad temporal de la operación push() en una pila implementada con un arreglo?",
-            codigo: null,
-            opciones: ["O(1)", "O(n)", "O(log n)", "O(n²)"],
-            correcta: 0
-        },
-        {
-            categoria: "Pilas",
-            enunciado: "¿Qué hace el siguiente código?",
-            codigo: "int pop() {\n    if (tope >= 0) {\n        int dato = arr[tope];\n        tope--;\n        return dato;\n    }\n    return -1;\n}",
-            opciones: ["Elimina y devuelve el elemento de la cima", "Solo devuelve el elemento de la cima", "Inserta un elemento en la base", "Verifica si la pila está llena"],
-            correcta: 0
-        },
-        {
-            categoria: "Pilas",
-            enunciado: "En una pila implementada con lista enlazada, ¿dónde se inserta un nuevo nodo?",
-            codigo: null,
-            opciones: ["Al inicio (cabeza) de la lista", "Al final de la lista", "En el medio de la lista", "En una posición aleatoria"],
-            correcta: 0
-        },
-        {
-            categoria: "Pilas",
-            enunciado: "¿Qué aplicación práctica NO corresponde al uso de una pila?",
-            codigo: null,
-            opciones: ["Gestión de procesos en cola de impresión", "Evaluación de expresiones aritméticas", "Deshacer operaciones (Undo)", "Recorrido DFS en grafos"],
-            correcta: 0
-        },
-        {
-            categoria: "Pilas",
-            enunciado: "¿Cuál es la salida del siguiente código?",
-            codigo: "stack<int> p;\np.push(5);\np.push(3);\np.push(8);\np.pop();\np.push(1);\ncout << p.top();",
-            opciones: ["1", "8", "3", "5"],
-            correcta: 0
-        },
-
-        // ========== COLAS (10) ==========
-        {
-            categoria: "Colas",
-            enunciado: "¿Qué principio sigue una estructura de datos tipo Cola (Queue)?",
-            codigo: null,
-            opciones: ["FIFO (First In, First Out)", "LIFO (Last In, First Out)", "LILO (Last In, Last Out)", "FILO (First In, Last Out)"],
-            correcta: 0
-        },
-        {
-            categoria: "Colas",
-            enunciado: "¿Qué hace el siguiente código sobre una cola implementada con arreglo circular?",
-            codigo: "void enqueue(int dato) {\n    if ((fin + 1) % MAX != frente) {\n        fin = (fin + 1) % MAX;\n        arr[fin] = dato;\n        if (frente == -1) frente = 0;\n    }\n}",
-            opciones: ["Inserta un elemento al final de la cola", "Elimina un elemento del frente", "Consulta el elemento del frente", "Verifica si la cola está vacía"],
-            correcta: 0
-        },
-        {
-            categoria: "Colas",
-            enunciado: "¿Cuál es la operación que elimina el elemento del frente de una cola?",
-            codigo: null,
-            opciones: ["dequeue()", "enqueue()", "front()", "rear()"],
-            correcta: 0
-        },
-        {
-            categoria: "Colas",
-            enunciado: "Dado el siguiente código, ¿qué valor devuelve front() después de ejecutar todas las operaciones?",
-            codigo: "queue<int> c;\nc.push(10);\nc.push(20);\nc.push(30);\nc.pop();\ncout << c.front();",
-            opciones: ["20", "10", "30", "Error"],
-            correcta: 0
-        },
-        {
-            categoria: "Colas",
-            enunciado: "¿Qué hace el siguiente código?",
-            codigo: "int dequeue() {\n    if (frente != -1) {\n        int dato = arr[frente];\n        if (frente == fin) {\n            frente = fin = -1;\n        } else {\n            frente = (frente + 1) % MAX;\n        }\n        return dato;\n    }\n    return -1;\n}",
-            opciones: ["Elimina y devuelve el elemento del frente de la cola", "Inserta un elemento al final", "Solo devuelve el elemento del frente", "Verifica si la cola está llena"],
-            correcta: 0
-        },
-        {
-            categoria: "Colas",
-            enunciado: "¿Cuál es la complejidad temporal de la operación enqueue() en una cola implementada con lista enlazada?",
-            codigo: null,
-            opciones: ["O(1)", "O(n)", "O(log n)", "O(n²)"],
-            correcta: 0
-        },
-        {
-            categoria: "Colas",
-            enunciado: "En una cola implementada con lista enlazada, ¿dónde se inserta un nuevo nodo?",
-            codigo: null,
-            opciones: ["Al final de la lista (cola)", "Al inicio de la lista (cabeza)", "En el medio de la lista", "En una posición aleatoria"],
-            correcta: 0
-        },
-        {
-            categoria: "Colas",
-            enunciado: "¿Qué aplicación práctica corresponde al uso de una cola?",
-            codigo: null,
-            opciones: ["Cola de impresión de documentos", "Evaluación de expresiones postfijas", "Deshacer operaciones (Undo)", "Recorrido DFS en grafos"],
-            correcta: 0
-        },
-        {
-            categoria: "Colas",
-            enunciado: "¿Cuál es la salida del siguiente código?",
-            codigo: "queue<int> c;\nc.push(4);\nc.push(7);\nc.push(2);\nc.pop();\nc.push(9);\ncout << c.front();",
-            opciones: ["7", "4", "2", "9"],
-            correcta: 0
-        },
-        {
-            categoria: "Colas",
-            enunciado: "¿Qué diferencia principal existe entre una Cola Circular y una Cola Simple?",
-            codigo: null,
-            opciones: ["La cola circular reutiliza los espacios vacíos al inicio del arreglo", "La cola circular permite acceso aleatorio", "La cola simple es más rápida en todas las operaciones", "No hay diferencia, son lo mismo"],
-            correcta: 0
-        },
-
-        // ========== LISTAS (10) ==========
-        {
-            categoria: "Listas",
-            enunciado: "¿Qué hace el siguiente código en una lista enlazada simple?",
-            codigo: "void insertarInicio(int dato) {\n    Nodo* nuevo = new Nodo();\n    nuevo->dato = dato;\n    nuevo->sig = cabeza;\n    cabeza = nuevo;\n}",
-            opciones: ["Inserta un nodo al inicio de la lista", "Inserta un nodo al final", "Elimina el primer nodo", "Busca un nodo en la lista"],
-            correcta: 0
-        },
-        {
-            categoria: "Listas",
-            enunciado: "¿Cuál es la complejidad temporal de insertar un nodo al inicio de una lista enlazada simple?",
-            codigo: null,
-            opciones: ["O(1)", "O(n)", "O(log n)", "O(n²)"],
-            correcta: 0
-        },
-        {
-            categoria: "Listas",
-            enunciado: "¿Qué hace el siguiente código?",
-            codigo: "void insertarFinal(int dato) {\n    Nodo* nuevo = new Nodo();\n    nuevo->dato = dato;\n    nuevo->sig = nullptr;\n    if (cabeza == nullptr) {\n        cabeza = nuevo;\n    } else {\n        Nodo* temp = cabeza;\n        while (temp->sig != nullptr) {\n            temp = temp->sig;\n        }\n        temp->sig = nuevo;\n    }\n}",
-            opciones: ["Inserta un nodo al final de la lista", "Inserta un nodo al inicio", "Elimina el último nodo", "Invierte la lista"],
-            correcta: 0
-        },
-        {
-            categoria: "Listas",
-            enunciado: "¿Cuál es la complejidad temporal de insertar un nodo al final de una lista enlazada simple?",
-            codigo: null,
-            opciones: ["O(n)", "O(1)", "O(log n)", "O(n²)"],
-            correcta: 0
-        },
-        {
-            categoria: "Listas",
-            enunciado: "¿Qué hace el siguiente código?",
-            codigo: "void eliminarInicio() {\n    if (cabeza != nullptr) {\n        Nodo* temp = cabeza;\n        cabeza = cabeza->sig;\n        delete temp;\n    }\n}",
-            opciones: ["Elimina el primer nodo de la lista", "Elimina el último nodo", "Elimina todos los nodos", "Inserta un nodo al inicio"],
-            correcta: 0
-        },
-        {
-            categoria: "Listas",
-            enunciado: "En una lista doblemente enlazada, cada nodo contiene:",
-            codigo: null,
-            opciones: ["dato, puntero al siguiente y puntero al anterior", "solo dato y puntero al siguiente", "solo dato", "dato y puntero al nodo raíz"],
-            correcta: 0
-        },
-        {
-            categoria: "Listas",
-            enunciado: "¿Qué hace el siguiente código en una lista doblemente enlazada?",
-            codigo: "Nodo* temp = cabeza;\nwhile (temp != nullptr) {\n    cout << temp->dato << \" \";\n    temp = temp->sig;\n}",
-            opciones: ["Recorre la lista de inicio a fin", "Recorre la lista de fin a inicio", "Elimina todos los nodos", "Invierte la lista"],
-            correcta: 0
-        },
-        {
-            categoria: "Listas",
-            enunciado: "¿Cuál es la principal ventaja de una lista doblemente enlazada sobre una simple?",
-            codigo: null,
-            opciones: ["Permite recorrer la lista en ambas direcciones", "Usa menos memoria", "Las inserciones son siempre O(1)", "No necesita punteros"],
-            correcta: 0
-        },
-        {
-            categoria: "Listas",
-            enunciado: "¿Qué hace el siguiente código?",
-            codigo: "Nodo* temp = cabeza;\nwhile (temp != nullptr && temp->dato != valor) {\n    temp = temp->sig;\n}\nif (temp != nullptr) cout << \"Encontrado\";",
-            opciones: ["Busca un valor en la lista enlazada", "Inserta un valor en la lista", "Elimina un valor de la lista", "Ordena la lista"],
-            correcta: 0
-        },
-        {
-            categoria: "Listas",
-            enunciado: "¿Qué tipo de lista tiene su último nodo apuntando al primer nodo?",
-            codigo: null,
-            opciones: ["Lista circular", "Lista doblemente enlazada", "Lista simple", "Lista ordenada"],
-            correcta: 0
-        },
-
-        // ========== MÉTODOS DE ORDENAMIENTO (10) ==========
+        // ========== MÉTODOS DE ORDENAMIENTO (15 preguntas) ==========
         {
             categoria: "Ordenamiento",
             enunciado: "¿Qué hace el siguiente algoritmo de ordenamiento?",
-            codigo: "for (int i = 0; i < n-1; i++) {\n    for (int j = 0; j < n-i-1; j++) {\n        if (arr[j] > arr[j+1]) {\n            swap(arr[j], arr[j+1]);\n        }\n    }\n}",
+            codigo: "for (int i = 0; i < n-1; i++) {
+    for (int j = 0; j < n-i-1; j++) {
+        if (arr[j] > arr[j+1]) {
+            swap(arr[j], arr[j+1]);
+        }
+    }
+}",
             opciones: ["Ordenamiento Burbuja (Bubble Sort)", "Ordenamiento por Selección", "Ordenamiento por Inserción", "Ordenamiento Rápido (Quick Sort)"],
             correcta: 0
         },
@@ -485,7 +276,15 @@
         {
             categoria: "Ordenamiento",
             enunciado: "¿Qué hace el siguiente algoritmo de ordenamiento?",
-            codigo: "for (int i = 1; i < n; i++) {\n    int key = arr[i];\n    int j = i - 1;\n    while (j >= 0 && arr[j] > key) {\n        arr[j+1] = arr[j];\n        j--;\n    }\n    arr[j+1] = key;\n}",
+            codigo: "for (int i = 1; i < n; i++) {
+    int key = arr[i];
+    int j = i - 1;
+    while (j >= 0 && arr[j] > key) {
+        arr[j+1] = arr[j];
+        j--;
+    }
+    arr[j+1] = key;
+}",
             opciones: ["Ordenamiento por Inserción (Insertion Sort)", "Ordenamiento Burbuja", "Ordenamiento por Selección", "Ordenamiento Rápido"],
             correcta: 0
         },
@@ -499,7 +298,14 @@
         {
             categoria: "Ordenamiento",
             enunciado: "¿Qué hace el siguiente algoritmo de ordenamiento?",
-            codigo: "for (int i = 0; i < n-1; i++) {\n    int minIdx = i;\n    for (int j = i+1; j < n; j++) {\n        if (arr[j] < arr[minIdx])\n            minIdx = j;\n    }\n    swap(arr[i], arr[minIdx]);\n}",
+            codigo: "for (int i = 0; i < n-1; i++) {
+    int minIdx = i;
+    for (int j = i+1; j < n; j++) {
+        if (arr[j] < arr[minIdx])
+            minIdx = j;
+    }
+    swap(arr[i], arr[minIdx]);
+}",
             opciones: ["Ordenamiento por Selección (Selection Sort)", "Ordenamiento Burbuja", "Ordenamiento por Inserción", "Ordenamiento Rápido"],
             correcta: 0
         },
@@ -526,7 +332,7 @@
         },
         {
             categoria: "Ordenamiento",
-            enunciado: "¿Qué método de ordenamiento selecciona un \"pivote\" y coloca los menores a su izquierda y los mayores a su derecha?",
+            enunciado: "¿Qué método de ordenamiento selecciona un "pivote" y coloca los menores a su izquierda y los mayores a su derecha?",
             codigo: null,
             opciones: ["Quick Sort", "Merge Sort", "Heap Sort", "Insertion Sort"],
             correcta: 0
@@ -538,76 +344,191 @@
             opciones: ["O(n²)", "O(n log n)", "O(n)", "O(log n)"],
             correcta: 0
         },
+        {
+            categoria: "Ordenamiento",
+            enunciado: "¿Cuál es la complejidad temporal del Quick Sort en el caso promedio?",
+            codigo: null,
+            opciones: ["O(n log n)", "O(n²)", "O(n)", "O(log n)"],
+            correcta: 0
+        },
+        {
+            categoria: "Ordenamiento",
+            enunciado: "¿Qué método de ordenamiento utiliza un montículo (heap) para ordenar los elementos?",
+            codigo: null,
+            opciones: ["Heap Sort", "Merge Sort", "Quick Sort", "Shell Sort"],
+            correcta: 0
+        },
+        {
+            categoria: "Ordenamiento",
+            enunciado: "¿Cuál de los siguientes algoritmos de ordenamiento es estable (mantiene el orden relativo de elementos iguales)?",
+            codigo: null,
+            opciones: ["Merge Sort", "Quick Sort", "Heap Sort", "Selection Sort"],
+            correcta: 0
+        },
+        {
+            categoria: "Ordenamiento",
+            enunciado: "¿Qué hace el siguiente código?",
+            codigo: "void quickSort(int arr[], int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high);
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}",
+            opciones: ["Implementa el algoritmo Quick Sort recursivamente", "Implementa Merge Sort", "Ordena por inserción", "Busca un elemento en el arreglo"],
+            correcta: 0
+        },
+        {
+            categoria: "Ordenamiento",
+            enunciado: "¿Cuál es la complejidad espacial del Merge Sort?",
+            codigo: null,
+            opciones: ["O(n)", "O(1)", "O(log n)", "O(n²)"],
+            correcta: 0
+        },
 
-        // ========== ÁRBOLES BINARIOS (10) ==========
+        // ========== GRAFOS (15 preguntas) ==========
         {
-            categoria: "Árboles Binarios",
-            enunciado: "¿Cuál es el recorrido de un árbol binario que visita: Raíz, Izquierdo, Derecho?",
+            categoria: "Grafos",
+            enunciado: "¿Qué es un grafo en teoría de grafos?",
             codigo: null,
-            opciones: ["Preorden (Pre-order)", "Inorden (In-order)", "Postorden (Post-order)", "Nivel por nivel (Level-order)"],
+            opciones: ["Una estructura de nodos (vértices) conectados por aristas", "Un árbol binario balanceado", "Una lista enlazada circular", "Un arreglo ordenado"],
             correcta: 0
         },
         {
-            categoria: "Árboles Binarios",
-            enunciado: "¿Cuál es el recorrido de un árbol binario que visita: Izquierdo, Raíz, Derecho?",
+            categoria: "Grafos",
+            enunciado: "¿Qué representa la siguiente matriz en un grafo?
+
+   A B C
+A [0 1 1]
+B [1 0 0]
+C [1 0 0]",
             codigo: null,
-            opciones: ["Inorden (In-order)", "Preorden (Pre-order)", "Postorden (Post-order)", "Nivel por nivel (Level-order)"],
+            opciones: ["Matriz de adyacencia de un grafo no dirigido", "Matriz de incidencia", "Lista de adyacencia", "Matriz de distancias"],
             correcta: 0
         },
         {
-            categoria: "Árboles Binarios",
-            enunciado: "¿Cuál es el recorrido de un árbol binario que visita: Izquierdo, Derecho, Raíz?",
+            categoria: "Grafos",
+            enunciado: "¿Cuál es la diferencia entre un grafo dirigido y uno no dirigido?",
             codigo: null,
-            opciones: ["Postorden (Post-order)", "Preorden (Pre-order)", "Inorden (In-order)", "Nivel por nivel (Level-order)"],
+            opciones: ["En el dirigido las aristas tienen dirección; en el no dirigido no", "El no dirigido tiene ciclos obligatoriamente", "El dirigido siempre es conexo", "No hay diferencia"],
             correcta: 0
         },
         {
-            categoria: "Árboles Binarios",
-            enunciado: "Dado el siguiente árbol binario, ¿cuál es su recorrido Inorden?\n        10\n       /  \\\n      5    15\n     / \\      \\\n    3   7     20",
+            categoria: "Grafos",
+            enunciado: "¿Qué hace el siguiente algoritmo?",
+            codigo: "void BFS(int inicio) {
+    bool visitado[V] = {false};
+    queue<int> q;
+    visitado[inicio] = true;
+    q.push(inicio);
+    while (!q.empty()) {
+        int v = q.front();
+        q.pop();
+        cout << v << " ";
+        for (int u : adj[v]) {
+            if (!visitado[u]) {
+                visitado[u] = true;
+                q.push(u);
+            }
+        }
+    }
+}",
+            opciones: ["Realiza un recorrido en anchura (BFS) del grafo", "Realiza un recorrido en profundidad (DFS)", "Encuentra el camino más corto", "Detecta ciclos en el grafo"],
+            correcta: 0
+        },
+        {
+            categoria: "Grafos",
+            enunciado: "¿Qué hace el siguiente algoritmo?",
+            codigo: "void DFS(int v) {
+    visitado[v] = true;
+    cout << v << " ";
+    for (int u : adj[v]) {
+        if (!visitado[u])
+            DFS(u);
+    }
+}",
+            opciones: ["Realiza un recorrido en profundidad (DFS) del grafo", "Realiza un recorrido en anchura (BFS)", "Ordena los vértices topológicamente", "Encuentra el árbol de expansión mínima"],
+            correcta: 0
+        },
+        {
+            categoria: "Grafos",
+            enunciado: "¿Qué estructura de datos auxiliar utiliza el algoritmo BFS?",
             codigo: null,
-            opciones: ["3, 5, 7, 10, 15, 20", "10, 5, 3, 7, 15, 20", "3, 7, 5, 20, 15, 10", "10, 15, 20, 5, 7, 3"],
+            opciones: ["Cola (Queue)", "Pila (Stack)", "Lista enlazada", "Montículo (Heap)"],
             correcta: 0
         },
         {
-            categoria: "Árboles Binarios",
-            enunciado: "Dado el mismo árbol, ¿cuál es su recorrido Preorden?",
+            categoria: "Grafos",
+            enunciado: "¿Qué estructura de datos auxiliar utiliza el algoritmo DFS recursivo implícitamente?",
             codigo: null,
-            opciones: ["10, 5, 3, 7, 15, 20", "3, 5, 7, 10, 15, 20", "3, 7, 5, 20, 15, 10", "10, 15, 20, 5, 7, 3"],
+            opciones: ["Pila de llamadas (Stack de recursión)", "Cola (Queue)", "Lista enlazada", "Arreglo ordenado"],
             correcta: 0
         },
         {
-            categoria: "Árboles Binarios",
-            enunciado: "Dado el mismo árbol, ¿cuál es su recorrido Postorden?",
+            categoria: "Grafos",
+            enunciado: "¿Cuál es la complejidad temporal del BFS en un grafo representado con lista de adyacencia?",
             codigo: null,
-            opciones: ["3, 7, 5, 20, 15, 10", "10, 5, 3, 7, 15, 20", "3, 5, 7, 10, 15, 20", "10, 15, 20, 5, 7, 3"],
+            opciones: ["O(V + E)", "O(V²)", "O(V * E)", "O(E²)"],
             correcta: 0
         },
         {
-            categoria: "Árboles Binarios",
-            enunciado: "¿Qué hace el siguiente código recursivo?",
-            codigo: "void inorden(Nodo* raiz) {\n    if (raiz != nullptr) {\n        inorden(raiz->izq);\n        cout << raiz->dato << \" \";\n        inorden(raiz->der);\n    }\n}",
-            opciones: ["Realiza un recorrido Inorden del árbol", "Realiza un recorrido Preorden", "Realiza un recorrido Postorden", "Elimina el árbol"],
-            correcta: 0
-        },
-        {
-            categoria: "Árboles Binarios",
-            enunciado: "¿Qué hace el siguiente código recursivo?",
-            codigo: "void preorden(Nodo* raiz) {\n    if (raiz != nullptr) {\n        cout << raiz->dato << \" \";\n        preorden(raiz->izq);\n        preorden(raiz->der);\n    }\n}",
-            opciones: ["Realiza un recorrido Preorden del árbol", "Realiza un recorrido Inorden", "Realiza un recorrido Postorden", "Busca un elemento en el árbol"],
-            correcta: 0
-        },
-        {
-            categoria: "Árboles Binarios",
-            enunciado: "¿Qué hace el siguiente código recursivo?",
-            codigo: "void postorden(Nodo* raiz) {\n    if (raiz != nullptr) {\n        postorden(raiz->izq);\n        postorden(raiz->der);\n        cout << raiz->dato << \" \";\n    }\n}",
-            opciones: ["Realiza un recorrido Postorden del árbol", "Realiza un recorrido Inorden", "Realiza un recorrido Preorden", "Cuenta los nodos del árbol"],
-            correcta: 0
-        },
-        {
-            categoria: "Árboles Binarios",
-            enunciado: "En un Árbol Binario de Búsqueda (ABB), ¿dónde se colocan los valores menores que la raíz?",
+            categoria: "Grafos",
+            enunciado: "¿Qué algoritmo encuentra el camino más corto desde un vértice origen a todos los demás en un grafo con pesos no negativos?",
             codigo: null,
-            opciones: ["En el subárbol izquierdo", "En el subárbol derecho", "En ambos subárboles", "No se permiten valores menores"],
+            opciones: ["Dijkstra", "Prim", "Kruskal", "Bellman-Ford"],
+            correcta: 0
+        },
+        {
+            categoria: "Grafos",
+            enunciado: "¿Qué algoritmo encuentra el Árbol de Expansión Mínima (MST) de un grafo no dirigido y conexo?",
+            codigo: null,
+            opciones: ["Prim o Kruskal", "Dijkstra", "BFS", "DFS"],
+            correcta: 0
+        },
+        {
+            categoria: "Grafos",
+            enunciado: "¿Qué es un grafo acíclico dirigido (DAG)?",
+            codigo: null,
+            opciones: ["Un grafo dirigido que no contiene ciclos", "Un grafo no dirigido con ciclos", "Un árbol binario completo", "Un grafo completamente conexo"],
+            correcta: 0
+        },
+        {
+            categoria: "Grafos",
+            enunciado: "¿Qué hace el siguiente código?",
+            codigo: "bool tieneCicloDFS(int v, bool visitado[], bool enPila[]) {
+    visitado[v] = true;
+    enPila[v] = true;
+    for (int u : adj[v]) {
+        if (!visitado[u] && tieneCicloDFS(u, visitado, enPila))
+            return true;
+        if (enPila[u])
+            return true;
+    }
+    enPila[v] = false;
+    return false;
+}",
+            opciones: ["Detecta si un grafo dirigido tiene ciclos", "Encuentra el camino más corto", "Ordena topológicamente", "Cuenta los componentes conexos"],
+            correcta: 0
+        },
+        {
+            categoria: "Grafos",
+            enunciado: "¿Qué representa el grado de un vértice en un grafo no dirigido?",
+            codigo: null,
+            opciones: ["El número de aristas incidentes en ese vértice", "La distancia al vértice más lejano", "El peso total de las aristas", "El número de vértices adyacentes al cuadrado"],
+            correcta: 0
+        },
+        {
+            categoria: "Grafos",
+            enunciado: "¿Cuál es la complejidad temporal del algoritmo de Dijkstra implementado con un montículo (heap)?",
+            codigo: null,
+            opciones: ["O((V + E) log V)", "O(V²)", "O(V * E)", "O(E²)"],
+            correcta: 0
+        },
+        {
+            categoria: "Grafos",
+            enunciado: "¿Qué es un grafo completo?",
+            codigo: null,
+            opciones: ["Un grafo donde cada par de vértices distintos está conectado por una arista", "Un grafo sin aristas", "Un grafo con exactamente un ciclo", "Un grafo que solo tiene un vértice"],
             correcta: 0
         }
     ];
