@@ -1,0 +1,883 @@
+
+html_content = '''<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen de Estructuras de Datos</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 850px;
+            width:100%;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            padding: 30px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .header h1 { font-size: 1.5rem; color:#1a1a2e; }
+        .timer {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #e63946;
+            background: #f8f9fa;
+            padding: 5px 18px;
+            border-radius: 40px;
+            border: 2px solid #e63946;
+        }
+        .timer.warning { animation: pulse 1s infinite; }
+        @keyframes pulse { 0%{opacity:1;} 50%{opacity:0.5;} }
+        .alumno-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            background: #f8f9fa;
+            padding: 12px 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .alumno-info label { font-weight:600; margin-right:5px; }
+        .alumno-info input, .alumno-info select {
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size:0.95rem;
+            width: 180px;
+        }
+        .alumno-info .campo { display:flex; align-items:center; gap:4px; }
+        .progress {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            font-size:0.95rem;
+        }
+        .progress .counter {
+            background: #e9ecef;
+            padding: 2px 14px;
+            border-radius: 20px;
+            font-weight:600;
+        }
+        .progress .bar {
+            flex:1;
+            height:8px;
+            background:#e9ecef;
+            border-radius:10px;
+        }
+        .progress .bar .fill {
+            height:100%;
+            background:#2a9d8f;
+            border-radius:10px;
+            transition:width 0.3s;
+            width:0%;
+        }
+        .pregunta-card {
+            background: #f8f9fc;
+            border-left: 5px solid #1a1a2e;
+            padding: 20px 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+        .pregunta-card .enunciado {
+            font-size:1.1rem;
+            line-height:1.6;
+            margin-bottom:15px;
+        }
+        .pregunta-card .codigo {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size:0.95rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 12px 0;
+        }
+        .opciones {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .opciones label {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            cursor: pointer;
+            transition:0.2s;
+        }
+        .opciones label:hover { background:#e9ecef; border-color:#adb5bd; }
+        .opciones input[type="radio"] {
+            margin-right:12px;
+            width:18px; height:18px;
+            accent-color:#1a1a2e;
+        }
+        .navegacion {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap:10px;
+            margin-top: 20px;
+        }
+        .navegacion button {
+            background: #1a1a2e;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size:1rem;
+            cursor:pointer;
+            transition:0.2s;
+        }
+        .navegacion button:hover:not(:disabled) { background:#0f3460; }
+        .navegacion button:disabled { background:#adb5bd; cursor:not-allowed; }
+        .navegacion .btn-enviar { background:#2a9d8f; }
+        .navegacion .btn-enviar:hover:not(:disabled) { background:#21867a; }
+        .navegacion .btn-final { background:#e63946; }
+        .resultado {
+            display: none;
+            margin-top: 25px;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .resultado.exito { background:#e8f5e9; }
+        .resultado.error { background:#ffebee; }
+        .resultado .nota { font-size:2.8rem; font-weight:700; color:#1a1a2e; }
+        .footer { margin-top:30px; text-align:center; font-size:0.85rem; color:#868e96; }
+        #cargando {
+            display: none;
+            text-align:center;
+            margin:15px 0;
+        }
+        .spinner {
+            border:4px solid #f3f3f3;
+            border-top:4px solid #1a1a2e;
+            border-radius:50%;
+            width:36px; height:36px;
+            animation:spin 1s linear infinite;
+            display:inline-block;
+        }
+        @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
+        @media (max-width:600px) {
+            .container { padding:18px; }
+            .header { flex-direction:column; align-items:stretch; }
+            .timer { align-self:flex-start; margin-top:10px; }
+            .alumno-info input { width:100%; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Examen de Estructuras de Datos</h1>
+        <div class="timer" id="timerDisplay">60:00</div>
+    </div>
+
+    <div class="alumno-info">
+        <div class="campo">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" placeholder="Ej: Pérez López Juan" required>
+        </div>
+        <div class="campo">
+            <label for="matricula">Matrícula:</label>
+            <input type="text" id="matricula" placeholder="Ej: 20240001" required>
+        </div>
+        <div class="campo">
+            <label for="grupo">Grupo:</label>
+            <input type="text" id="grupo" placeholder="Ej: 6201" required>
+        </div>
+        <div class="campo">
+            <label for="ciclo">Ciclo:</label>
+            <select id="ciclo" required>
+                <option value="">Selecciona...</option>
+                <option value="2026-1">2026-1</option>
+                <option value="2026-2">2026-2</option>
+                <option value="2027-1">2027-1</option>
+                <option value="2027-2">2027-2</option>
+                <option value="2028-1">2028-1</option>
+                <option value="2028-2">2028-2</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="progress">
+        <span class="counter" id="pregCounter">1 / 50</span>
+        <div class="bar"><div class="fill" id="progressFill"></div></div>
+        <span id="categoriaLabel" style="font-weight:500; color:#2a9d8f;">General</span>
+    </div>
+
+    <div class="pregunta-card" id="preguntaCard">
+        <div class="enunciado" id="enunciado"></div>
+        <div id="codigoContainer" style="display:none;" class="codigo"></div>
+        <div class="opciones" id="opcionesContainer"></div>
+    </div>
+
+    <div class="navegacion">
+        <button id="btnAnterior" disabled>◀ Anterior</button>
+        <button id="btnSiguiente" class="btn-enviar">Siguiente ▶</button>
+        <button id="btnEnviar" class="btn-final">📤 Enviar</button>
+    </div>
+
+    <div id="cargando"><div class="spinner"></div><p>Guardando resultados...</p></div>
+
+    <div id="resultado" class="resultado"></div>
+    <div class="footer">@ 2026 Prof. Fabián Soberanes Martín</div>
+</div>
+
+<script>
+    const SUPABASE_URL = "https://etucngqlvlcwmdspbkdv.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_zs6LEneJQKH2F0XZ4kFvuQ_OMoORP4R";
+
+    const PREGUNTAS_BASE = [
+        // ========== PILAS (10) ==========
+        {
+            categoria: "Pilas",
+            enunciado: "¿Qué principio sigue una estructura de datos tipo Pila (Stack)?",
+            codigo: null,
+            opciones: ["LIFO (Last In, First Out)", "FIFO (First In, First Out)", "LILO (Last In, Last Out)", "FILO (First In, Last Out)"],
+            correcta: 0
+        },
+        {
+            categoria: "Pilas",
+            enunciado: "¿Qué hace el siguiente código sobre una pila implementada con un arreglo?",
+            codigo: "void push(int dato) {\n    if (tope < MAX - 1) {\n        tope++;\n        arr[tope] = dato;\n    }\n}",
+            opciones: ["Inserta un elemento en la cima de la pila", "Elimina el elemento de la cima", "Consulta el elemento de la cima", "Verifica si la pila está vacía"],
+            correcta: 0
+        },
+        {
+            categoria: "Pilas",
+            enunciado: "¿Cuál es la operación que elimina el elemento de la cima de una pila?",
+            codigo: null,
+            opciones: ["pop()", "push()", "peek() / top()", "isEmpty()"],
+            correcta: 0
+        },
+        {
+            categoria: "Pilas",
+            enunciado: "Dado el siguiente código, ¿qué valor devuelve peek() después de ejecutar todas las operaciones?",
+            codigo: "stack<int> p;\np.push(10);\np.push(20);\np.push(30);\np.pop();\ncout << p.top();",
+            opciones: ["20", "30", "10", "Error"],
+            correcta: 0
+        },
+        {
+            categoria: "Pilas",
+            enunciado: "¿Qué hace el siguiente código?",
+            codigo: "bool estaVacia() {\n    return tope == -1;\n}",
+            opciones: ["Verifica si la pila está vacía", "Verifica si la pila está llena", "Devuelve el tamaño de la pila", "Elimina todos los elementos"],
+            correcta: 0
+        },
+        {
+            categoria: "Pilas",
+            enunciado: "¿Cuál es la complejidad temporal de la operación push() en una pila implementada con un arreglo?",
+            codigo: null,
+            opciones: ["O(1)", "O(n)", "O(log n)", "O(n²)"],
+            correcta: 0
+        },
+        {
+            categoria: "Pilas",
+            enunciado: "¿Qué hace el siguiente código?",
+            codigo: "int pop() {\n    if (tope >= 0) {\n        int dato = arr[tope];\n        tope--;\n        return dato;\n    }\n    return -1;\n}",
+            opciones: ["Elimina y devuelve el elemento de la cima", "Solo devuelve el elemento de la cima", "Inserta un elemento en la base", "Verifica si la pila está llena"],
+            correcta: 0
+        },
+        {
+            categoria: "Pilas",
+            enunciado: "En una pila implementada con lista enlazada, ¿dónde se inserta un nuevo nodo?",
+            codigo: null,
+            opciones: ["Al inicio (cabeza) de la lista", "Al final de la lista", "En el medio de la lista", "En una posición aleatoria"],
+            correcta: 0
+        },
+        {
+            categoria: "Pilas",
+            enunciado: "¿Qué aplicación práctica NO corresponde al uso de una pila?",
+            codigo: null,
+            opciones: ["Gestión de procesos en cola de impresión", "Evaluación de expresiones aritméticas", "Deshacer operaciones (Undo)", "Recorrido DFS en grafos"],
+            correcta: 0
+        },
+        {
+            categoria: "Pilas",
+            enunciado: "¿Cuál es la salida del siguiente código?",
+            codigo: "stack<int> p;\np.push(5);\np.push(3);\np.push(8);\np.pop();\np.push(1);\ncout << p.top();",
+            opciones: ["1", "8", "3", "5"],
+            correcta: 0
+        },
+
+        // ========== COLAS (10) ==========
+        {
+            categoria: "Colas",
+            enunciado: "¿Qué principio sigue una estructura de datos tipo Cola (Queue)?",
+            codigo: null,
+            opciones: ["FIFO (First In, First Out)", "LIFO (Last In, First Out)", "LILO (Last In, Last Out)", "FILO (First In, Last Out)"],
+            correcta: 0
+        },
+        {
+            categoria: "Colas",
+            enunciado: "¿Qué hace el siguiente código sobre una cola implementada con arreglo circular?",
+            codigo: "void enqueue(int dato) {\n    if ((fin + 1) % MAX != frente) {\n        fin = (fin + 1) % MAX;\n        arr[fin] = dato;\n        if (frente == -1) frente = 0;\n    }\n}",
+            opciones: ["Inserta un elemento al final de la cola", "Elimina un elemento del frente", "Consulta el elemento del frente", "Verifica si la cola está vacía"],
+            correcta: 0
+        },
+        {
+            categoria: "Colas",
+            enunciado: "¿Cuál es la operación que elimina el elemento del frente de una cola?",
+            codigo: null,
+            opciones: ["dequeue()", "enqueue()", "front()", "rear()"],
+            correcta: 0
+        },
+        {
+            categoria: "Colas",
+            enunciado: "Dado el siguiente código, ¿qué valor devuelve front() después de ejecutar todas las operaciones?",
+            codigo: "queue<int> c;\nc.push(10);\nc.push(20);\nc.push(30);\nc.pop();\ncout << c.front();",
+            opciones: ["20", "10", "30", "Error"],
+            correcta: 0
+        },
+        {
+            categoria: "Colas",
+            enunciado: "¿Qué hace el siguiente código?",
+            codigo: "int dequeue() {\n    if (frente != -1) {\n        int dato = arr[frente];\n        if (frente == fin) {\n            frente = fin = -1;\n        } else {\n            frente = (frente + 1) % MAX;\n        }\n        return dato;\n    }\n    return -1;\n}",
+            opciones: ["Elimina y devuelve el elemento del frente de la cola", "Inserta un elemento al final", "Solo devuelve el elemento del frente", "Verifica si la cola está llena"],
+            correcta: 0
+        },
+        {
+            categoria: "Colas",
+            enunciado: "¿Cuál es la complejidad temporal de la operación enqueue() en una cola implementada con lista enlazada?",
+            codigo: null,
+            opciones: ["O(1)", "O(n)", "O(log n)", "O(n²)"],
+            correcta: 0
+        },
+        {
+            categoria: "Colas",
+            enunciado: "En una cola implementada con lista enlazada, ¿dónde se inserta un nuevo nodo?",
+            codigo: null,
+            opciones: ["Al final de la lista (cola)", "Al inicio de la lista (cabeza)", "En el medio de la lista", "En una posición aleatoria"],
+            correcta: 0
+        },
+        {
+            categoria: "Colas",
+            enunciado: "¿Qué aplicación práctica corresponde al uso de una cola?",
+            codigo: null,
+            opciones: ["Cola de impresión de documentos", "Evaluación de expresiones postfijas", "Deshacer operaciones (Undo)", "Recorrido DFS en grafos"],
+            correcta: 0
+        },
+        {
+            categoria: "Colas",
+            enunciado: "¿Cuál es la salida del siguiente código?",
+            codigo: "queue<int> c;\nc.push(4);\nc.push(7);\nc.push(2);\nc.pop();\nc.push(9);\ncout << c.front();",
+            opciones: ["7", "4", "2", "9"],
+            correcta: 0
+        },
+        {
+            categoria: "Colas",
+            enunciado: "¿Qué diferencia principal existe entre una Cola Circular y una Cola Simple?",
+            codigo: null,
+            opciones: ["La cola circular reutiliza los espacios vacíos al inicio del arreglo", "La cola circular permite acceso aleatorio", "La cola simple es más rápida en todas las operaciones", "No hay diferencia, son lo mismo"],
+            correcta: 0
+        },
+
+        // ========== LISTAS (10) ==========
+        {
+            categoria: "Listas",
+            enunciado: "¿Qué hace el siguiente código en una lista enlazada simple?",
+            codigo: "void insertarInicio(int dato) {\n    Nodo* nuevo = new Nodo();\n    nuevo->dato = dato;\n    nuevo->sig = cabeza;\n    cabeza = nuevo;\n}",
+            opciones: ["Inserta un nodo al inicio de la lista", "Inserta un nodo al final", "Elimina el primer nodo", "Busca un nodo en la lista"],
+            correcta: 0
+        },
+        {
+            categoria: "Listas",
+            enunciado: "¿Cuál es la complejidad temporal de insertar un nodo al inicio de una lista enlazada simple?",
+            codigo: null,
+            opciones: ["O(1)", "O(n)", "O(log n)", "O(n²)"],
+            correcta: 0
+        },
+        {
+            categoria: "Listas",
+            enunciado: "¿Qué hace el siguiente código?",
+            codigo: "void insertarFinal(int dato) {\n    Nodo* nuevo = new Nodo();\n    nuevo->dato = dato;\n    nuevo->sig = nullptr;\n    if (cabeza == nullptr) {\n        cabeza = nuevo;\n    } else {\n        Nodo* temp = cabeza;\n        while (temp->sig != nullptr) {\n            temp = temp->sig;\n        }\n        temp->sig = nuevo;\n    }\n}",
+            opciones: ["Inserta un nodo al final de la lista", "Inserta un nodo al inicio", "Elimina el último nodo", "Invierte la lista"],
+            correcta: 0
+        },
+        {
+            categoria: "Listas",
+            enunciado: "¿Cuál es la complejidad temporal de insertar un nodo al final de una lista enlazada simple?",
+            codigo: null,
+            opciones: ["O(n)", "O(1)", "O(log n)", "O(n²)"],
+            correcta: 0
+        },
+        {
+            categoria: "Listas",
+            enunciado: "¿Qué hace el siguiente código?",
+            codigo: "void eliminarInicio() {\n    if (cabeza != nullptr) {\n        Nodo* temp = cabeza;\n        cabeza = cabeza->sig;\n        delete temp;\n    }\n}",
+            opciones: ["Elimina el primer nodo de la lista", "Elimina el último nodo", "Elimina todos los nodos", "Inserta un nodo al inicio"],
+            correcta: 0
+        },
+        {
+            categoria: "Listas",
+            enunciado: "En una lista doblemente enlazada, cada nodo contiene:",
+            codigo: null,
+            opciones: ["dato, puntero al siguiente y puntero al anterior", "solo dato y puntero al siguiente", "solo dato", "dato y puntero al nodo raíz"],
+            correcta: 0
+        },
+        {
+            categoria: "Listas",
+            enunciado: "¿Qué hace el siguiente código en una lista doblemente enlazada?",
+            codigo: "Nodo* temp = cabeza;\nwhile (temp != nullptr) {\n    cout << temp->dato << \" \";\n    temp = temp->sig;\n}",
+            opciones: ["Recorre la lista de inicio a fin", "Recorre la lista de fin a inicio", "Elimina todos los nodos", "Invierte la lista"],
+            correcta: 0
+        },
+        {
+            categoria: "Listas",
+            enunciado: "¿Cuál es la principal ventaja de una lista doblemente enlazada sobre una simple?",
+            codigo: null,
+            opciones: ["Permite recorrer la lista en ambas direcciones", "Usa menos memoria", "Las inserciones son siempre O(1)", "No necesita punteros"],
+            correcta: 0
+        },
+        {
+            categoria: "Listas",
+            enunciado: "¿Qué hace el siguiente código?",
+            codigo: "Nodo* temp = cabeza;\nwhile (temp != nullptr && temp->dato != valor) {\n    temp = temp->sig;\n}\nif (temp != nullptr) cout << \"Encontrado\";",
+            opciones: ["Busca un valor en la lista enlazada", "Inserta un valor en la lista", "Elimina un valor de la lista", "Ordena la lista"],
+            correcta: 0
+        },
+        {
+            categoria: "Listas",
+            enunciado: "¿Qué tipo de lista tiene su último nodo apuntando al primer nodo?",
+            codigo: null,
+            opciones: ["Lista circular", "Lista doblemente enlazada", "Lista simple", "Lista ordenada"],
+            correcta: 0
+        },
+
+        // ========== MÉTODOS DE ORDENAMIENTO (10) ==========
+        {
+            categoria: "Ordenamiento",
+            enunciado: "¿Qué hace el siguiente algoritmo de ordenamiento?",
+            codigo: "for (int i = 0; i < n-1; i++) {\n    for (int j = 0; j < n-i-1; j++) {\n        if (arr[j] > arr[j+1]) {\n            swap(arr[j], arr[j+1]);\n        }\n    }\n}",
+            opciones: ["Ordenamiento Burbuja (Bubble Sort)", "Ordenamiento por Selección", "Ordenamiento por Inserción", "Ordenamiento Rápido (Quick Sort)"],
+            correcta: 0
+        },
+        {
+            categoria: "Ordenamiento",
+            enunciado: "¿Cuál es la complejidad temporal del Bubble Sort en el peor caso?",
+            codigo: null,
+            opciones: ["O(n²)", "O(n log n)", "O(n)", "O(log n)"],
+            correcta: 0
+        },
+        {
+            categoria: "Ordenamiento",
+            enunciado: "¿Qué hace el siguiente algoritmo de ordenamiento?",
+            codigo: "for (int i = 1; i < n; i++) {\n    int key = arr[i];\n    int j = i - 1;\n    while (j >= 0 && arr[j] > key) {\n        arr[j+1] = arr[j];\n        j--;\n    }\n    arr[j+1] = key;\n}",
+            opciones: ["Ordenamiento por Inserción (Insertion Sort)", "Ordenamiento Burbuja", "Ordenamiento por Selección", "Ordenamiento Rápido"],
+            correcta: 0
+        },
+        {
+            categoria: "Ordenamiento",
+            enunciado: "¿Cuál es la complejidad temporal del Insertion Sort en el mejor caso (arreglo ya ordenado)?",
+            codigo: null,
+            opciones: ["O(n)", "O(n²)", "O(n log n)", "O(log n)"],
+            correcta: 0
+        },
+        {
+            categoria: "Ordenamiento",
+            enunciado: "¿Qué hace el siguiente algoritmo de ordenamiento?",
+            codigo: "for (int i = 0; i < n-1; i++) {\n    int minIdx = i;\n    for (int j = i+1; j < n; j++) {\n        if (arr[j] < arr[minIdx])\n            minIdx = j;\n    }\n    swap(arr[i], arr[minIdx]);\n}",
+            opciones: ["Ordenamiento por Selección (Selection Sort)", "Ordenamiento Burbuja", "Ordenamiento por Inserción", "Ordenamiento Rápido"],
+            correcta: 0
+        },
+        {
+            categoria: "Ordenamiento",
+            enunciado: "¿Cuál es la complejidad temporal del Selection Sort en todos los casos?",
+            codigo: null,
+            opciones: ["O(n²)", "O(n log n)", "O(n)", "O(log n)"],
+            correcta: 0
+        },
+        {
+            categoria: "Ordenamiento",
+            enunciado: "¿Qué método de ordenamiento divide el arreglo en dos partes, ordena cada parte recursivamente y luego las mezcla?",
+            codigo: null,
+            opciones: ["Merge Sort", "Quick Sort", "Heap Sort", "Bubble Sort"],
+            correcta: 0
+        },
+        {
+            categoria: "Ordenamiento",
+            enunciado: "¿Cuál es la complejidad temporal del Merge Sort en todos los casos?",
+            codigo: null,
+            opciones: ["O(n log n)", "O(n²)", "O(n)", "O(log n)"],
+            correcta: 0
+        },
+        {
+            categoria: "Ordenamiento",
+            enunciado: "¿Qué método de ordenamiento selecciona un \"pivote\" y coloca los menores a su izquierda y los mayores a su derecha?",
+            codigo: null,
+            opciones: ["Quick Sort", "Merge Sort", "Heap Sort", "Insertion Sort"],
+            correcta: 0
+        },
+        {
+            categoria: "Ordenamiento",
+            enunciado: "¿Cuál es la complejidad temporal del Quick Sort en el peor caso?",
+            codigo: null,
+            opciones: ["O(n²)", "O(n log n)", "O(n)", "O(log n)"],
+            correcta: 0
+        },
+
+        // ========== ÁRBOLES BINARIOS (10) ==========
+        {
+            categoria: "Árboles Binarios",
+            enunciado: "¿Cuál es el recorrido de un árbol binario que visita: Raíz, Izquierdo, Derecho?",
+            codigo: null,
+            opciones: ["Preorden (Pre-order)", "Inorden (In-order)", "Postorden (Post-order)", "Nivel por nivel (Level-order)"],
+            correcta: 0
+        },
+        {
+            categoria: "Árboles Binarios",
+            enunciado: "¿Cuál es el recorrido de un árbol binario que visita: Izquierdo, Raíz, Derecho?",
+            codigo: null,
+            opciones: ["Inorden (In-order)", "Preorden (Pre-order)", "Postorden (Post-order)", "Nivel por nivel (Level-order)"],
+            correcta: 0
+        },
+        {
+            categoria: "Árboles Binarios",
+            enunciado: "¿Cuál es el recorrido de un árbol binario que visita: Izquierdo, Derecho, Raíz?",
+            codigo: null,
+            opciones: ["Postorden (Post-order)", "Preorden (Pre-order)", "Inorden (In-order)", "Nivel por nivel (Level-order)"],
+            correcta: 0
+        },
+        {
+            categoria: "Árboles Binarios",
+            enunciado: "Dado el siguiente árbol binario, ¿cuál es su recorrido Inorden?\n        10\n       /  \\\n      5    15\n     / \\      \\\n    3   7     20",
+            codigo: null,
+            opciones: ["3, 5, 7, 10, 15, 20", "10, 5, 3, 7, 15, 20", "3, 7, 5, 20, 15, 10", "10, 15, 20, 5, 7, 3"],
+            correcta: 0
+        },
+        {
+            categoria: "Árboles Binarios",
+            enunciado: "Dado el mismo árbol, ¿cuál es su recorrido Preorden?",
+            codigo: null,
+            opciones: ["10, 5, 3, 7, 15, 20", "3, 5, 7, 10, 15, 20", "3, 7, 5, 20, 15, 10", "10, 15, 20, 5, 7, 3"],
+            correcta: 0
+        },
+        {
+            categoria: "Árboles Binarios",
+            enunciado: "Dado el mismo árbol, ¿cuál es su recorrido Postorden?",
+            codigo: null,
+            opciones: ["3, 7, 5, 20, 15, 10", "10, 5, 3, 7, 15, 20", "3, 5, 7, 10, 15, 20", "10, 15, 20, 5, 7, 3"],
+            correcta: 0
+        },
+        {
+            categoria: "Árboles Binarios",
+            enunciado: "¿Qué hace el siguiente código recursivo?",
+            codigo: "void inorden(Nodo* raiz) {\n    if (raiz != nullptr) {\n        inorden(raiz->izq);\n        cout << raiz->dato << \" \";\n        inorden(raiz->der);\n    }\n}",
+            opciones: ["Realiza un recorrido Inorden del árbol", "Realiza un recorrido Preorden", "Realiza un recorrido Postorden", "Elimina el árbol"],
+            correcta: 0
+        },
+        {
+            categoria: "Árboles Binarios",
+            enunciado: "¿Qué hace el siguiente código recursivo?",
+            codigo: "void preorden(Nodo* raiz) {\n    if (raiz != nullptr) {\n        cout << raiz->dato << \" \";\n        preorden(raiz->izq);\n        preorden(raiz->der);\n    }\n}",
+            opciones: ["Realiza un recorrido Preorden del árbol", "Realiza un recorrido Inorden", "Realiza un recorrido Postorden", "Busca un elemento en el árbol"],
+            correcta: 0
+        },
+        {
+            categoria: "Árboles Binarios",
+            enunciado: "¿Qué hace el siguiente código recursivo?",
+            codigo: "void postorden(Nodo* raiz) {\n    if (raiz != nullptr) {\n        postorden(raiz->izq);\n        postorden(raiz->der);\n        cout << raiz->dato << \" \";\n    }\n}",
+            opciones: ["Realiza un recorrido Postorden del árbol", "Realiza un recorrido Inorden", "Realiza un recorrido Preorden", "Cuenta los nodos del árbol"],
+            correcta: 0
+        },
+        {
+            categoria: "Árboles Binarios",
+            enunciado: "En un Árbol Binario de Búsqueda (ABB), ¿dónde se colocan los valores menores que la raíz?",
+            codigo: null,
+            opciones: ["En el subárbol izquierdo", "En el subárbol derecho", "En ambos subárboles", "No se permiten valores menores"],
+            correcta: 0
+        }
+    ];
+
+    function shuffleOptions(pregunta) {
+        const opciones = pregunta.opciones.slice();
+        const correctaOriginal = pregunta.correcta;
+        const textoCorrecto = opciones[correctaOriginal];
+        for (let i = opciones.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [opciones[i], opciones[j]] = [opciones[j], opciones[i]];
+        }
+        const nuevaCorrecta = opciones.indexOf(textoCorrecto);
+        return { opciones: opciones, correcta: nuevaCorrecta };
+    }
+
+    let preguntas = PREGUNTAS_BASE.map(p => {
+        const shuffled = shuffleOptions(p);
+        return {
+            categoria: p.categoria,
+            enunciado: p.enunciado,
+            codigo: p.codigo,
+            opciones: shuffled.opciones,
+            correcta: shuffled.correcta
+        };
+    });
+
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+    preguntas = shuffleArray(preguntas);
+
+    let current = 0;
+    const total = preguntas.length;
+    const respuestas = new Array(total).fill(null);
+    let tiempoRestante = 3600;
+    let timerInterval = null;
+    let examenFinalizado = false;
+
+    const btnAnt = document.getElementById('btnAnterior');
+    const btnSig = document.getElementById('btnSiguiente');
+    const btnEnviar = document.getElementById('btnEnviar');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const progressFill = document.getElementById('progressFill');
+    const pregCounter = document.getElementById('pregCounter');
+    const categoriaLabel = document.getElementById('categoriaLabel');
+    const enunciadoDiv = document.getElementById('enunciado');
+    const codigoDiv = document.getElementById('codigoContainer');
+    const opcionesDiv = document.getElementById('opcionesContainer');
+    const resultadoDiv = document.getElementById('resultado');
+    const cargandoDiv = document.getElementById('cargando');
+
+    function renderPregunta(index) {
+        const p = preguntas[index];
+        enunciadoDiv.textContent = p.enunciado;
+        if (p.codigo) {
+            codigoDiv.style.display = 'block';
+            codigoDiv.textContent = p.codigo;
+        } else {
+            codigoDiv.style.display = 'none';
+        }
+        opcionesDiv.innerHTML = '';
+        p.opciones.forEach((texto, i) => {
+            const label = document.createElement('label');
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = 'pregunta';
+            radio.value = i;
+            if (respuestas[index] === i) radio.checked = true;
+            radio.addEventListener('change', () => {
+                respuestas[index] = i;
+                actualizarBotonEnviar();
+            });
+            label.appendChild(radio);
+            label.appendChild(document.createTextNode(' ' + texto));
+            opcionesDiv.appendChild(label);
+        });
+
+        pregCounter.textContent = `${index+1} / ${total}`;
+        const pct = ((index+1) / total) * 100;
+        progressFill.style.width = pct + '%';
+        categoriaLabel.textContent = p.categoria || 'General';
+
+        btnAnt.disabled = (index === 0);
+        btnSig.textContent = (index === total-1) ? '📤 Finalizar' : 'Siguiente ▶';
+        actualizarBotonEnviar();
+    }
+
+    function actualizarBotonEnviar() {
+        const todas = respuestas.every(r => r !== null);
+        btnEnviar.disabled = !todas;
+        btnEnviar.style.opacity = todas ? '1' : '0.6';
+    }
+
+    function irAPregunta(index) {
+        if (index < 0 || index >= total || examenFinalizado) return;
+        current = index;
+        renderPregunta(current);
+    }
+
+    btnAnt.addEventListener('click', () => irAPregunta(current-1));
+    btnSig.addEventListener('click', () => {
+        if (current === total-1) {
+            enviarExamen();
+        } else {
+            irAPregunta(current+1);
+        }
+    });
+
+    function iniciarTemporizador() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            tiempoRestante--;
+            actualizarTiempo();
+            if (tiempoRestante <= 0) {
+                clearInterval(timerInterval);
+                alert('⏰ Tiempo agotado. El examen se enviará automáticamente.');
+                enviarExamen();
+            }
+        }, 1000);
+    }
+
+    function actualizarTiempo() {
+        const mins = Math.floor(tiempoRestante / 60);
+        const segs = tiempoRestante % 60;
+        timerDisplay.textContent = `${String(mins).padStart(2,'0')}:${String(segs).padStart(2,'0')}`;
+        if (tiempoRestante < 300) timerDisplay.classList.add('warning');
+        else timerDisplay.classList.remove('warning');
+    }
+
+    async function enviarExamen() {
+        if (examenFinalizado) return;
+
+        const nombre = document.getElementById('nombre').value.trim();
+        const matricula = document.getElementById('matricula').value.trim();
+        const grupo = document.getElementById('grupo').value.trim();
+        const ciclo = document.getElementById('ciclo').value.trim();
+
+        if (!nombre || !matricula || !grupo || !ciclo) {
+            alert('Por favor, completa todos los campos (nombre, matrícula, grupo y ciclo).');
+            return;
+        }
+
+        const todas = respuestas.every(r => r !== null);
+        if (!todas) {
+            alert('Aún hay preguntas sin responder. Revisa la barra de progreso.');
+            return;
+        }
+
+        let aciertos = 0;
+        for (let i=0; i<total; i++) {
+            if (respuestas[i] === preguntas[i].correcta) aciertos++;
+        }
+        const calificacion = (aciertos / total) * 10;
+
+        btnEnviar.disabled = true;
+        btnSig.disabled = true;
+        btnAnt.disabled = true;
+        cargandoDiv.style.display = 'block';
+        resultadoDiv.style.display = 'none';
+
+        try {
+            let alumnoId = null;
+            const buscarResp = await fetch(`${SUPABASE_URL}/rest/v1/alumnos?matricula=eq.${encodeURIComponent(matricula)}&select=id`, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            const buscarData = await buscarResp.json();
+            if (buscarData && buscarData.length > 0) {
+                alumnoId = buscarData[0].id;
+            } else {
+                const crearResp = await fetch(`${SUPABASE_URL}/rest/v1/alumnos`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify({ matricula, nombre })
+                });
+                const crearData = await crearResp.json();
+                if (crearData && crearData.length > 0) {
+                    alumnoId = crearData[0].id;
+                } else {
+                    throw new Error('No se pudo crear el alumno');
+                }
+            }
+
+            const resultado = {
+                alumno_id: alumnoId,
+                aciertos: aciertos,
+                total_preguntas: total,
+                calificacion: parseFloat(calificacion.toFixed(2)),
+                fecha_hora: new Date().toISOString(),
+                grupo: grupo,
+                ciclo: ciclo
+            };
+
+            const insertResp = await fetch(`${SUPABASE_URL}/rest/v1/resultados`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                },
+                body: JSON.stringify(resultado)
+            });
+
+            if (!insertResp.ok) {
+                const errorText = await insertResp.text();
+                throw new Error(`Error al guardar: ${errorText}`);
+            }
+
+            examenFinalizado = true;
+            clearInterval(timerInterval);
+            mostrarResultado(true, nombre, matricula, aciertos, calificacion);
+
+        } catch (error) {
+            console.error(error);
+            mostrarResultado(false, nombre, matricula, aciertos, calificacion, error.message);
+        } finally {
+            cargandoDiv.style.display = 'none';
+            btnEnviar.disabled = false;
+        }
+    }
+
+    function mostrarResultado(exito, nombre, matricula, aciertos, calificacion, errorMsg = '') {
+        resultadoDiv.style.display = 'block';
+        resultadoDiv.className = 'resultado ' + (exito ? 'exito' : 'error');
+        if (exito) {
+            resultadoDiv.innerHTML = `
+                <h2>¡Examen completado!</h2>
+                <p><strong>Alumno:</strong> ${nombre} (${matricula})</p>
+                <p><strong>Aciertos:</strong> ${aciertos} de ${total}</p>
+                <p class="nota">${calificacion.toFixed(2)} / 10</p>
+                <p style="color: green;">✅ Resultados guardados.</p>
+            `;
+        } else {
+            resultadoDiv.innerHTML = `
+                <h2>⚠️ Error al guardar</h2>
+                <p><strong>Alumno:</strong> ${nombre} (${matricula})</p>
+                <p><strong>Aciertos:</strong> ${aciertos} de ${total}</p>
+                <p class="nota">${calificacion.toFixed(2)} / 10</p>
+                <p style="color: red;">❌ No se pudieron guardar los resultados: ${errorMsg}</p>
+                <p>Verifica tu conexión y que las columnas 'grupo' y 'ciclo' existan en la tabla resultados.</p>
+            `;
+        }
+        btnAnt.disabled = true;
+        btnSig.disabled = true;
+        btnEnviar.disabled = true;
+    }
+
+    window.onload = function() {
+        renderPregunta(0);
+        iniciarTemporizador();
+        actualizarBotonEnviar();
+        btnEnviar.addEventListener('click', enviarExamen);
+    };
+</script>
+</body>
+</html>'''
+
+with open("/mnt/agents/output/Examen_Estructuras_Datos.html", "w", encoding="utf-8") as f:
+    f.write(html_content)
+
+print("✓ Archivo HTML generado exitosamente")
+print(f"Total de preguntas en el banco: 50")
+print("Temas: Pilas (10), Colas (10), Listas (10), Ordenamiento (10), Árboles Binarios (10)")
