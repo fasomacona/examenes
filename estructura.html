@@ -187,7 +187,6 @@
             .alumno-info input { width:100%; }
         }
     </style>
-<base target="_blank">
 </head>
 <body>
 <div class="container">
@@ -256,13 +255,7 @@
         {
             categoria: "Ordenamiento",
             enunciado: "¿Qué hace el siguiente algoritmo de ordenamiento?",
-            codigo: "for (int i = 0; i < n-1; i++) {
-    for (int j = 0; j < n-i-1; j++) {
-        if (arr[j] > arr[j+1]) {
-            swap(arr[j], arr[j+1]);
-        }
-    }
-}",
+            codigo: "for (int i = 0; i < n-1; i++) {\n    for (int j = 0; j < n-i-1; j++) {\n        if (arr[j] > arr[j+1]) {\n            swap(arr[j], arr[j+1]);\n        }\n    }\n}",
             opciones: ["Ordenamiento Burbuja (Bubble Sort)", "Ordenamiento por Selección", "Ordenamiento por Inserción", "Ordenamiento Rápido (Quick Sort)"],
             correcta: 0
         },
@@ -276,15 +269,7 @@
         {
             categoria: "Ordenamiento",
             enunciado: "¿Qué hace el siguiente algoritmo de ordenamiento?",
-            codigo: "for (int i = 1; i < n; i++) {
-    int key = arr[i];
-    int j = i - 1;
-    while (j >= 0 && arr[j] > key) {
-        arr[j+1] = arr[j];
-        j--;
-    }
-    arr[j+1] = key;
-}",
+            codigo: "for (int i = 1; i < n; i++) {\n    int key = arr[i];\n    int j = i - 1;\n    while (j >= 0 && arr[j] > key) {\n        arr[j+1] = arr[j];\n        j--;\n    }\n    arr[j+1] = key;\n}",
             opciones: ["Ordenamiento por Inserción (Insertion Sort)", "Ordenamiento Burbuja", "Ordenamiento por Selección", "Ordenamiento Rápido"],
             correcta: 0
         },
@@ -298,14 +283,7 @@
         {
             categoria: "Ordenamiento",
             enunciado: "¿Qué hace el siguiente algoritmo de ordenamiento?",
-            codigo: "for (int i = 0; i < n-1; i++) {
-    int minIdx = i;
-    for (int j = i+1; j < n; j++) {
-        if (arr[j] < arr[minIdx])
-            minIdx = j;
-    }
-    swap(arr[i], arr[minIdx]);
-}",
+            codigo: "for (int i = 0; i < n-1; i++) {\n    int minIdx = i;\n    for (int j = i+1; j < n; j++) {\n        if (arr[j] < arr[minIdx])\n            minIdx = j;\n    }\n    swap(arr[i], arr[minIdx]);\n}",
             opciones: ["Ordenamiento por Selección (Selection Sort)", "Ordenamiento Burbuja", "Ordenamiento por Inserción", "Ordenamiento Rápido"],
             correcta: 0
         },
@@ -332,7 +310,7 @@
         },
         {
             categoria: "Ordenamiento",
-            enunciado: "¿Qué método de ordenamiento selecciona un "pivote" y coloca los menores a su izquierda y los mayores a su derecha?",
+            enunciado: "¿Qué método de ordenamiento selecciona un \"pivote\" y coloca los menores a su izquierda y los mayores a su derecha?",
             codigo: null,
             opciones: ["Quick Sort", "Merge Sort", "Heap Sort", "Insertion Sort"],
             correcta: 0
@@ -368,13 +346,7 @@
         {
             categoria: "Ordenamiento",
             enunciado: "¿Qué hace el siguiente código?",
-            codigo: "void quickSort(int arr[], int low, int high) {
-    if (low < high) {
-        int pi = partition(arr, low, high);
-        quickSort(arr, low, pi - 1);
-        quickSort(arr, pi + 1, high);
-    }
-}",
+            codigo: "void quickSort(int arr[], int low, int high) {\n    if (low < high) {\n        int pi = partition(arr, low, high);\n        quickSort(arr, low, pi - 1);\n        quickSort(arr, pi + 1, high);\n    }\n}",
             opciones: ["Implementa el algoritmo Quick Sort recursivamente", "Implementa Merge Sort", "Ordena por inserción", "Busca un elemento en el arreglo"],
             correcta: 0
         },
@@ -396,12 +368,7 @@
         },
         {
             categoria: "Grafos",
-            enunciado: "¿Qué representa la siguiente matriz en un grafo?
-
-   A B C
-A [0 1 1]
-B [1 0 0]
-C [1 0 0]",
+            enunciado: "¿Qué representa la siguiente matriz en un grafo?\n\n   A B C\nA [0 1 1]\nB [1 0 0]\nC [1 0 0]",
             codigo: null,
             opciones: ["Matriz de adyacencia de un grafo no dirigido", "Matriz de incidencia", "Lista de adyacencia", "Matriz de distancias"],
             correcta: 0
@@ -416,37 +383,14 @@ C [1 0 0]",
         {
             categoria: "Grafos",
             enunciado: "¿Qué hace el siguiente algoritmo?",
-            codigo: "void BFS(int inicio) {
-    bool visitado[V] = {false};
-    queue<int> q;
-    visitado[inicio] = true;
-    q.push(inicio);
-    while (!q.empty()) {
-        int v = q.front();
-        q.pop();
-        cout << v << " ";
-        for (int u : adj[v]) {
-            if (!visitado[u]) {
-                visitado[u] = true;
-                q.push(u);
-            }
-        }
-    }
-}",
+            codigo: "void BFS(int inicio) {\n    bool visitado[V] = {false};\n    queue<int> q;\n    visitado[inicio] = true;\n    q.push(inicio);\n    while (!q.empty()) {\n        int v = q.front();\n        q.pop();\n        cout << v << \" \";\n        for (int u : adj[v]) {\n            if (!visitado[u]) {\n                visitado[u] = true;\n                q.push(u);\n            }\n        }\n    }\n}",
             opciones: ["Realiza un recorrido en anchura (BFS) del grafo", "Realiza un recorrido en profundidad (DFS)", "Encuentra el camino más corto", "Detecta ciclos en el grafo"],
             correcta: 0
         },
         {
             categoria: "Grafos",
             enunciado: "¿Qué hace el siguiente algoritmo?",
-            codigo: "void DFS(int v) {
-    visitado[v] = true;
-    cout << v << " ";
-    for (int u : adj[v]) {
-        if (!visitado[u])
-            DFS(u);
-    }
-}",
+            codigo: "void DFS(int v) {\n    visitado[v] = true;\n    cout << v << \" \";\n    for (int u : adj[v]) {\n        if (!visitado[u])\n            DFS(u);\n    }\n}",
             opciones: ["Realiza un recorrido en profundidad (DFS) del grafo", "Realiza un recorrido en anchura (BFS)", "Ordena los vértices topológicamente", "Encuentra el árbol de expansión mínima"],
             correcta: 0
         },
@@ -495,18 +439,7 @@ C [1 0 0]",
         {
             categoria: "Grafos",
             enunciado: "¿Qué hace el siguiente código?",
-            codigo: "bool tieneCicloDFS(int v, bool visitado[], bool enPila[]) {
-    visitado[v] = true;
-    enPila[v] = true;
-    for (int u : adj[v]) {
-        if (!visitado[u] && tieneCicloDFS(u, visitado, enPila))
-            return true;
-        if (enPila[u])
-            return true;
-    }
-    enPila[v] = false;
-    return false;
-}",
+            codigo: "bool tieneCicloDFS(int v, bool visitado[], bool enPila[]) {\n    visitado[v] = true;\n    enPila[v] = true;\n    for (int u : adj[v]) {\n        if (!visitado[u] && tieneCicloDFS(u, visitado, enPila))\n            return true;\n        if (enPila[u])\n            return true;\n    }\n    enPila[v] = false;\n    return false;\n}",
             opciones: ["Detecta si un grafo dirigido tiene ciclos", "Encuentra el camino más corto", "Ordena topológicamente", "Cuenta los componentes conexos"],
             correcta: 0
         },
