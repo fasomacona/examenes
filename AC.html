@@ -189,7 +189,7 @@
     </div>
 
     <div class="info-box">
-        <strong>📅 Información del evento:</strong><br>
+        <strong> Información del evento:</strong><br>
         Aprende a utilizar Python para el análisis de datos y pronósticos predictivos. 
         Se requiere conocimientos básicos de programación.
     </div>
@@ -197,7 +197,7 @@
     <form id="registroForm">
         <div class="form-group">
             <label for="nombre">Nombre completo <span class="required">*</span></label>
-            <input type="text" id="nombre" name="nombre" placeholder="Ej: Juan Pérez López" required>
+            <input type="text" id="nombre" name="nombre" placeholder="Ej: Pérez López Juan" required>
         </div>
 
         <div class="form-row">
@@ -214,15 +214,14 @@
         <div class="form-group">
             <label for="carrera">Carrera <span class="required">*</span></label>
             <select id="carrera" name="carrera" required>
-                <option value="">Selecciona tu carrera...</option>
+                <option value="">Selecciona tu carrera...</option> 
+                <option value="Ingeniería Informática">Ingeniería Informática</option>
                 <option value="Ingeniería en Sistemas Computacionales">Ingeniería en Sistemas Computacionales</option>
-                <option value="Ingeniería en Tecnologías de la Información">Ingeniería en Tecnologías de la Información</option>
                 <option value="Ingeniería en Software">Ingeniería en Software</option>
                 <option value="Ingeniería en Electrónica">Ingeniería en Electrónica</option>
-                <option value="Ingeniería Mecatrónica">Ingeniería Mecatrónica</option>
+                <option value="Ingeniería Electromecánica">Ingeniería Electromecánica"</option>
                 <option value="Ingeniería Industrial">Ingeniería Industrial</option>
                 <option value="Licenciatura en Administración">Licenciatura en Administración</option>
-                <option value="Licenciatura en Contaduría">Licenciatura en Contaduría</option>
                 <option value="Otra">Otra</option>
             </select>
         </div>
@@ -233,7 +232,7 @@
         </div>
 
         <button type="submit" class="btn-submit" id="btnSubmit">
-            <span>📋 Registrar mi participación</span>
+            <span> Registrar mi participación</span>
             <div class="spinner" id="spinner"></div>
         </button>
     </form>
@@ -321,16 +320,16 @@
             const data = await response.json();
 
             // Éxito
-            mostrarMensaje('exito', `✅ ¡Registro exitoso! ${nombre}, has quedado inscrito en la actividad. Tu número de registro es: ${data[0]?.id || 'confirmado'}.`);
+            mostrarMensaje('exito', ` ¡Registro exitoso! ${nombre}, has quedado inscrito en la actividad. Tu número de registro es: ${data[0]?.id || 'confirmado'}.`);
             form.reset();
 
         } catch (error) {
             console.error(error);
-            mostrarMensaje('error', '❌ Error al guardar el registro. Verifica tu conexión o intenta más tarde. Detalle: ' + error.message);
+            mostrarMensaje('error', 'Error al guardar el registro. Verifica tu conexión o intenta más tarde. Detalle: ' + error.message);
         } finally {
             btnSubmit.disabled = false;
             spinner.style.display = 'none';
-            btnSubmit.querySelector('span').textContent = '📋 Registrar mi participación';
+            btnSubmit.querySelector('span').textContent = ' Registrar mi participación';
         }
     });
 </script>
