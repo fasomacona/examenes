@@ -334,8 +334,8 @@ function applyFilters(){
   VIEW = RAW.filter(r => {
     if (mat && r.examen !== mat) return false;
     if (grp && (r.grupo || '') !== grp) return false;
-    if (est === 'aprobado' && !(r.calificacion >= 60)) return false;
-    if (est === 'reprobado' && !(r.calificacion < 60)) return false;
+    if (est === 'aprobado' && !(r.calificacion >= 70)) return false;
+    if (est === 'reprobado' && !(r.calificacion < 70)) return false;
     if (est === 'faltas'   && r.motivo_fin !== 'violaciones') return false;
     if (est === 'tiempo'   && r.motivo_fin !== 'tiempo') return false;
     if (est === 'manual'   && r.motivo_fin !== 'manual') return false;
@@ -379,7 +379,7 @@ function renderKPIs(){
   }
 
   const prom = VIEW.reduce((a,r) => a + (Number(r.calificacion)||0), 0) / n;
-  const apr  = VIEW.filter(r => r.calificacion >= 60).length;
+  const apr  = VIEW.filter(r => r.calificacion >= 70).length;
   const rep  = n - apr;
   const faltas = VIEW.reduce((a,r) => a + (Number(r.num_faltas)||0), 0);
 
@@ -440,7 +440,7 @@ function renderCharts(){
   });
 
   // 2. Aprobados vs Reprobados
-  const apr = VIEW.filter(r => r.calificacion >= 60).length;
+  const apr = VIEW.filter(r => r.calificacion >= 70).length;
   const rep = n - apr;
   destroyChart('pass');
   charts.pass = new Chart($('chart-pass'), {
@@ -492,7 +492,7 @@ function renderCharts(){
       datasets:[{
         label:'Promedio',
         data: data3,
-        backgroundColor: data3.map(v => v < 60 ? DANGER() : v < 80 ? WARN() : ACCENT()),
+        backgroundColor: data3.map(v => v < 70 ? DANGER() : v < 80 ? WARN() : ACCENT()),
         borderRadius:6
       }]
     },
@@ -597,7 +597,7 @@ function renderCharts(){
       datasets:[{
         label:'Estudiante',
         data: points,
-        backgroundColor: points.map(p => p.y < 60 ? DANGER() : ACCENT()),
+        backgroundColor: points.map(p => p.y < 70 ? DANGER() : ACCENT()),
         borderColor: 'transparent',
         pointRadius: 6,
         pointHoverRadius: 9
@@ -661,8 +661,8 @@ function renderTable(){
 
   tb.innerHTML = sorted.map(r => {
     const c = Number(r.calificacion)||0;
-    const cls = c < 60 ? 'bad' : c < 80 ? 'mid' : 'good';
-    const pill = c >= 60
+    const cls = c < 70 ? 'bad' : c < 80 ? 'mid' : 'good';
+    const pill = c >= 70
       ? `<span class="pill ok">Aprobado</span>`
       : `<span class="pill bad">Reprobado</span>`;
     return `<tr>
@@ -711,7 +711,7 @@ function exportExcel(){
   /* Hoja 1: Resumen */
   const n = VIEW.length;
   const prom = VIEW.reduce((a,r) => a + (Number(r.calificacion)||0), 0) / n;
-  const apr = VIEW.filter(r => r.calificacion >= 60).length;
+  const apr = VIEW.filter(r => r.calificacion >= 70).length;
   const rep = n - apr;
   const faltasTotal = VIEW.reduce((a,r) => a + (Number(r.num_faltas)||0), 0);
   const durProm = VIEW.reduce((a,r) => a + (Number(r.duracion_seg)||0), 0) / n;
