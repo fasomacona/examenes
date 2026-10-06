@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel de resultados · Exámenes en línea</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{
+  --bg:#EDF0F5; --surface:#FFFFFF; --ink:#16202E; --muted:#566275; --line:#C9D1DD; --grid:#E6EAF1;
+  --accent:#0E7C6B; --accent-ink:#FFFFFF; --accent-soft:#D6EFEA;
+  --warn:#9A4A06; --warn-soft:#FBE6C4;
+  --danger:#B3261E; --danger-soft:#FBE0DD;
+  --info:#1D4ED8; --info-soft:#DDE5FE;
+  --focus:#1D4ED8;
+  --radius:10px;
+  font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1620; --surface:#172231; --ink:#E7ECF3; --muted:#9AA7B8; --line:#2C3B50; --grid:#1B283A;
+    --accent:#34C3A8; --accent-ink:#06241F; --accent-soft:#123A35;
+    --warn:#F0B04A; --warn-soft:#3B2A0E;
+    --danger:#FF8A80; --danger-soft:#3D1815;
+    --info:#7AA2FF; --info-soft:#17233E;
+    --focus:#7AA2FF;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-size:16px;line-height:1.5}
+[hidden]{display:none!important}
+h1,h2,h3{line-height:1.2;margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+select,input{font:inherit}
+
+.wrap{max-width:1400px;margin:0 auto;padding:26px 20px 60px}
+
+/* Header */
+.header{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:flex-end;margin-bottom:22px}
+.header h1{font-size:clamp(1.5rem,3.4vw,2.1rem);font-weight:700;letter-spacing:-.01em}
+.header p{color:var(--muted);margin:6px 0 0}
+.header .actions{display:flex;gap:10px;flex-wrap:wrap}
+
+.btn{border:1.5px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 16px;font-weight:700;display:inline-flex;gap:8px;align-items:center}
+.btn:hover:not(:disabled){border-color:var(--ink)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover:not(:disabled){filter:brightness(1.08);border-color:var(--accent)}
+.btn.ghost{background:transparent}
+
+/* Filtros */
+.filters{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:22px;align-items:end}
+@media (max-width:900px){.filters{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.filters{grid-template-columns:1fr}}
+.field label{display:block;font-weight:700;font-size:.9rem;margin-bottom:4px;color:var(--muted)}
+.field select,.field input{width:100%;padding:9px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.field select:focus,.field input:focus{outline:none;border-color:var(--accent)}
+
+/* KPI cards */
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-bottom:22px}
+@media (max-width:1000px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:460px){.kpis{grid-template-columns:1fr}}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px}
+.kpi .label{color:var(--muted);font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.kpi .val{font-size:clamp(1.6rem,3vw,2rem);font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1;margin-top:6px}
+.kpi .sub{color:var(--muted);font-size:.85rem;margin-top:2px}
+.kpi.accent .val{color:var(--accent)}
+.kpi.danger .val{color:var(--danger)}
+.kpi.warn .val{color:var(--warn)}
+
+/* Charts */
+.charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-bottom:22px}
+@media (max-width:960px){.charts{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+.card h3{font-size:1rem;margin-bottom:12px;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.card h3 small{color:var(--muted);font-weight:400;font-size:.82rem}
+.chart-box{position:relative;height:280px}
+.chart-box.tall{height:320px}
+
+/* Tabla */
+.table-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.table-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:16px 18px;border-bottom:1px solid var(--line);align-items:center}
+.table-head h3{font-size:1rem}
+.table-head .meta{color:var(--muted);font-size:.88rem}
+.table-wrap{overflow-x:auto;max-height:560px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+thead th{position:sticky;top:0;background:var(--surface);text-align:left;font-size:.82rem;color:var(--muted);
+  font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap;cursor:pointer;user-select:none}
+thead th:hover{color:var(--ink)}
+thead th .arrow{opacity:.4;font-size:.75rem;margin-left:4px}
+thead th.sorted .arrow{opacity:1;color:var(--accent)}
+tbody td{padding:10px 12px;border-bottom:1px solid var(--grid);white-space:nowrap;font-size:.94rem}
+tbody tr:hover{background:var(--bg)}
+tbody tr:last-child td{border-bottom:none}
+.pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.82rem;font-weight:700;white-space:nowrap}
+.pill.ok{background:var(--accent-soft);color:var(--accent)}
+.pill.bad{background:var(--danger-soft);color:var(--danger)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.info{background:var(--info-soft);color:var(--info)}
+.grade{font-weight:700}
+.grade.bad{color:var(--danger)}
+.grade.mid{color:var(--warn)}
+.grade.good{color:var(--accent)}
+
+/* Estados */
+.state{padding:40px 20px;text-align:center;color:var(--muted)}
+.state .spin{display:inline-block;width:34px;height:34px;border:4px solid var(--line);border-top-color:var(--accent);
+  border-radius:50%;animation:spin 1s linear infinite;margin-bottom:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.msg{padding:12px 14px;border-radius:8px;font-size:.95rem;margin-bottom:18px}
+.msg.err{background:var(--danger-soft);color:var(--danger)}
+.msg.warn{background:var(--warn-soft);color:var(--warn)}
+.msg.ok{background:var(--accent-soft);color:var(--accent)}
+.msg.info{background:var(--info-soft);color:var(--info)}
+.empty{color:var(--muted);font-size:.95rem;padding:30px 12px;text-align:center}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="header">
+    <div>
+      <h1>Panel de resultados de exámenes</h1>
+      <p>Análisis estadístico · Descarga de datos · Filtros por grupo y materia</p>
+    </div>
+    <div class="actions">
+      <button class="btn" id="btn-reload" type="button">↻ Recargar</button>
+      <button class="btn primary" id="btn-export" type="button" disabled>⬇ Descargar Excel</button>
+    </div>
+  </div>
+
+  <div id="cfg-warn" class="msg warn" hidden></div>
+  <div id="load-err" class="msg err" hidden></div>
+
+  <!-- Filtros -->
+  <section class="filters" aria-label="Filtros">
+    <div class="field">
+      <label for="f-materia">Materia / Examen</label>
+      <select id="f-materia"><option value="">Todas las materias</option></select>
+    </div>
+    <div class="field">
+      <label for="f-grupo">Grupo</label>
+      <select id="f-grupo"><option value="">Todos los grupos</option></select>
+    </div>
+    <div class="field">
+      <label for="f-estado">Estatus</label>
+      <select id="f-estado">
+        <option value="">Todos</option>
+        <option value="aprobado">Aprobados (≥ 60)</option>
+        <option value="reprobado">Reprobados (&lt; 60)</option>
+        <option value="faltas">Terminó por faltas</option>
+        <option value="tiempo">Se agotó el tiempo</option>
+        <option value="manual">Entregó manualmente</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="f-buscar">Buscar por nombre o matrícula</label>
+      <input id="f-buscar" type="text" placeholder="Ej. Juan Pérez o 20230045">
+    </div>
+  </section>
+
+  <!-- KPIs -->
+  <section class="kpis" aria-label="Indicadores">
+    <div class="kpi"><div class="label">Estudiantes</div><div class="val" id="kpi-total">—</div><div class="sub" id="kpi-total-sub">registros filtrados</div></div>
+    <div class="kpi accent"><div class="label">Promedio</div><div class="val" id="kpi-prom">—</div><div class="sub" id="kpi-prom-sub">calificación global</div></div>
+    <div class="kpi"><div class="label">Aprobados</div><div class="val" id="kpi-apr">—</div><div class="sub" id="kpi-apr-sub">tasa de aprobación</div></div>
+    <div class="kpi danger"><div class="label">Reprobados</div><div class="val" id="kpi-rep">—</div><div class="sub" id="kpi-rep-sub">calificación &lt; 60</div></div>
+    <div class="kpi warn"><div class="label">Faltas</div><div class="val" id="kpi-faltas">—</div><div class="sub" id="kpi-faltas-sub">total acumulado</div></div>
+  </section>
+
+  <!-- Charts -->
+  <section class="charts">
+    <div class="card">
+      <h3>Distribución de calificaciones <small id="c1-sub"></small></h3>
+      <div class="chart-box"><canvas id="chart-dist"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>Aprobados vs Reprobados <small id="c2-sub"></small></h3>
+      <div class="chart-box"><canvas id="chart-pass"></canvas></div>
+    </div>
+    <div class="card">
+      <h3 id="c3-title">Promedio por grupo <small id="c3-sub"></small></h3>
+      <div class="chart-box"><canvas id="chart-grupo"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>Aciertos por subtema <small id="c4-sub"></small></h3>
+      <div class="chart-box tall"><canvas id="chart-temas"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>Motivo de finalización <small id="c5-sub"></small></h3>
+      <div class="chart-box"><canvas id="chart-motivo"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>Faltas vs calificación <small id="c6-sub"></small></h3>
+      <div class="chart-box"><canvas id="chart-faltas"></canvas></div>
+    </div>
+  </section>
+
+  <!-- Tabla -->
+  <section class="table-card">
+    <div class="table-head">
+      <div>
+        <h3>Resultados individuales</h3>
+        <div class="meta" id="tabla-meta"></div>
+      </div>
+      <div class="meta">Haz clic en los encabezados para ordenar</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th data-key="nombre">Nombre <span class="arrow">▲▼</span></th>
+            <th data-key="matricula">Matrícula <span class="arrow">▲▼</span></th>
+            <th data-key="grupo">Grupo <span class="arrow">▲▼</span></th>
+            <th data-key="examen">Materia <span class="arrow">▲▼</span></th>
+            <th data-key="calificacion">Calificación <span class="arrow">▲▼</span></th>
+            <th data-key="aciertos">Aciertos <span class="arrow">▲▼</span></th>
+            <th data-key="num_faltas">Faltas <span class="arrow">▲▼</span></th>
+            <th data-key="motivo_fin">Motivo <span class="arrow">▲▼</span></th>
+            <th data-key="duracion_seg">Duración <span class="arrow">▲▼</span></th>
+            <th data-key="inicio">Fecha <span class="arrow">▲▼</span></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div id="tabla-empty" class="empty" hidden>No hay registros que coincidan con los filtros.</div>
+    </div>
+  </section>
+
+  <div id="loading" class="state"><div class="spin"></div><div>Cargando resultados…</div></div>
+</div>
+
+<script>
+/* =====================================================================
+   CONFIGURACIÓN  ← misma que en los exámenes
+   ===================================================================== */
+const CONFIG = {
+  SUPABASE_URL: 'https://pwbjvvjmocnjmkkyokrw.supabase.co',
+  SUPABASE_ANON_KEY: 'sb_publishable_icxQRBw8vcE6r-oULCO0Lg_UZ5Dnj6q',
+  TABLE: 'resultados_examen'
+};
+
+const $ = id => document.getElementById(id);
+const fmtDate = iso => {
+  if (!iso) return '—';
+  try{
+    const d = new Date(iso);
+    return d.toLocaleString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  }catch{ return iso; }
+};
+const fmtDur = s => {
+  if (s == null) return '—';
+  const m = Math.floor(s/60), sec = s%60;
+  return `${m}m ${String(sec).padStart(2,'0')}s`;
+};
+const fmtGrupo = g => (g == null || g === '') ? '—' : g;
+const reasonLabel = r => ({manual:'Manual', tiempo:'Tiempo', violaciones:'Faltas'}[r] || r || '—');
+
+let sb = null;
+let RAW = [];             // todos los datos
+let VIEW = [];            // filtrados
+let SORT = { key:'inicio', dir:'desc' };
+const charts = {};
+
+/* =====================================================================
+   INIT
+   ===================================================================== */
+async function init(){
+  if (CONFIG.SUPABASE_URL.includes('TU-PROYECTO') || CONFIG.SUPABASE_ANON_KEY.startsWith('TU_')){
+    $('cfg-warn').hidden = false;
+    $('cfg-warn').textContent = 'Falta configurar las credenciales de Supabase en este archivo (SUPABASE_URL y SUPABASE_ANON_KEY).';
+    $('loading').hidden = true;
+    return;
+  }
+  if (!window.supabase){
+    $('load-err').hidden = false;
+    $('load-err').textContent = 'No se pudo cargar la librería de Supabase (revisa tu conexión).';
+    $('loading').hidden = true;
+    return;
+  }
+  sb = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+  await load();
+}
+
+async function load(){
+  $('loading').hidden = false;
+  $('load-err').hidden = true;
+  try{
+    const { data, error } = await sb.from(CONFIG.TABLE)
+      .select('*')
+      .order('inicio', { ascending: false });
+    if (error) throw error;
+    RAW = data || [];
+    populateFilters();
+    applyFilters();
+  }catch(e){
+    $('load-err').hidden = false;
+    $('load-err').textContent = 'Error al consultar Supabase: ' + (e.message || e) +
+      '  ·  Verifica que la tabla "' + CONFIG.TABLE + '" exista y que la política RLS permita SELECT.';
+    $('loading').hidden = true;
+  }
+}
+
+/* =====================================================================
+   FILTROS
+   ===================================================================== */
+function populateFilters(){
+  const materias = [...new Set(RAW.map(r => r.examen).filter(Boolean))].sort();
+  const grupos   = [...new Set(RAW.map(r => r.grupo).filter(Boolean))].sort();
+
+  const selM = $('f-materia');
+  selM.innerHTML = '<option value="">Todas las materias</option>' +
+    materias.map(m => `<option value="${escapeAttr(m)}">${escapeHtml(m)}</option>`).join('');
+
+  const selG = $('f-grupo');
+  selG.innerHTML = '<option value="">Todos los grupos</option>' +
+    grupos.map(g => `<option value="${escapeAttr(g)}">${escapeHtml(g)}</option>`).join('');
+}
+
+function applyFilters(){
+  const mat = $('f-materia').value;
+  const grp = $('f-grupo').value;
+  const est = $('f-estado').value;
+  const q   = $('f-buscar').value.trim().toLowerCase();
+
+  VIEW = RAW.filter(r => {
+    if (mat && r.examen !== mat) return false;
+    if (grp && (r.grupo || '') !== grp) return false;
+    if (est === 'aprobado' && !(r.calificacion >= 70)) return false;
+    if (est === 'reprobado' && !(r.calificacion < 70)) return false;
+    if (est === 'faltas'   && r.motivo_fin !== 'violaciones') return false;
+    if (est === 'tiempo'   && r.motivo_fin !== 'tiempo') return false;
+    if (est === 'manual'   && r.motivo_fin !== 'manual') return false;
+    if (q){
+      const t = `${r.nombre || ''} ${r.matricula || ''}`.toLowerCase();
+      if (!t.includes(q)) return false;
+    }
+    return true;
+  });
+
+  renderKPIs();
+  renderCharts();
+  renderTable();
+  $('btn-export').disabled = VIEW.length === 0;
+  $('loading').hidden = true;
+}
+
+['f-materia','f-grupo','f-estado'].forEach(id => $(id).addEventListener('change', applyFilters));
+let searchT;
+$('f-buscar').addEventListener('input', () => {
+  clearTimeout(searchT);
+  searchT = setTimeout(applyFilters, 180);
+});
+$('btn-reload').addEventListener('click', load);
+
+/* =====================================================================
+   KPIs
+   ===================================================================== */
+function renderKPIs(){
+  const n = VIEW.length;
+  $('kpi-total').textContent = n;
+  $('kpi-total-sub').textContent = n === RAW.length ? 'registros totales' : `de ${RAW.length} registros`;
+
+  if (!n){
+    ['kpi-prom','kpi-apr','kpi-rep','kpi-faltas'].forEach(id => $(id).textContent = '—');
+    $('kpi-prom-sub').textContent = 'sin datos';
+    $('kpi-apr-sub').textContent = 'sin datos';
+    $('kpi-rep-sub').textContent = 'sin datos';
+    $('kpi-faltas-sub').textContent = 'sin datos';
+    return;
+  }
+
+  const prom = VIEW.reduce((a,r) => a + (Number(r.calificacion)||0), 0) / n;
+  const apr  = VIEW.filter(r => r.calificacion >= 70).length;
+  const rep  = n - apr;
+  const faltas = VIEW.reduce((a,r) => a + (Number(r.num_faltas)||0), 0);
+
+  $('kpi-prom').textContent = prom.toFixed(1);
+  $('kpi-prom-sub').textContent = 'calificación global';
+  $('kpi-apr').textContent = apr;
+  $('kpi-apr-sub').textContent = `${(apr/n*100).toFixed(0)} % del grupo`;
+  $('kpi-rep').textContent = rep;
+  $('kpi-rep-sub').textContent = `${(rep/n*100).toFixed(0)} % del grupo`;
+  $('kpi-faltas').textContent = faltas;
+  $('kpi-faltas-sub').textContent = `promedio ${(faltas/n).toFixed(1)} por alumno`;
+}
+
+/* =====================================================================
+   GRÁFICAS
+   ===================================================================== */
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const ACCENT = () => css('--accent') || '#0E7C6B';
+const DANGER = () => css('--danger') || '#B3261E';
+const WARN   = () => css('--warn')   || '#9A4A06';
+const MUTED  = () => css('--muted')  || '#566275';
+const INFO   = () => css('--info')   || '#1D4ED8';
+const LINE   = () => css('--line')   || '#C9D1DD';
+const INK    = () => css('--ink')    || '#16202E';
+
+function destroyChart(k){ if (charts[k]){ charts[k].destroy(); delete charts[k]; } }
+
+function renderCharts(){
+  const n = VIEW.length;
+  const labelSub = (n === RAW.length ? 'todos los registros' : `${n} registros filtrados`);
+  ['c1-sub','c2-sub','c3-sub','c4-sub','c5-sub','c6-sub'].forEach(id => $(id).textContent = labelSub);
+
+  // 1. Distribución de calificaciones
+  const bins = [
+    { r:'0-49',   c:0 }, { r:'50-59', c:0 }, { r:'60-69', c:0 },
+    { r:'70-79',  c:0 }, { r:'80-89', c:0 }, { r:'90-100', c:0 }
+  ];
+  VIEW.forEach(r => {
+    const c = Number(r.calificacion)||0;
+    let i = 0;
+    if (c < 50) i = 0; else if (c < 60) i = 1; else if (c < 70) i = 2;
+    else if (c < 80) i = 3; else if (c < 90) i = 4; else i = 5;
+    bins[i].c++;
+  });
+  destroyChart('dist');
+  charts.dist = new Chart($('chart-dist'), {
+    type:'bar',
+    data:{
+      labels: bins.map(b => b.r),
+      datasets:[{
+        label:'Estudiantes',
+        data: bins.map(b => b.c),
+        backgroundColor: bins.map((_,i) => i<2 ? DANGER() : (i<3 ? WARN() : ACCENT())),
+        borderRadius:6
+      }]
+    },
+    options: baseOpts()
+  });
+
+  // 2. Aprobados vs Reprobados
+  const apr = VIEW.filter(r => r.calificacion >= 70).length;
+  const rep = n - apr;
+  destroyChart('pass');
+  charts.pass = new Chart($('chart-pass'), {
+    type:'doughnut',
+    data:{
+      labels:['Aprobados','Reprobados'],
+      datasets:[{
+        data:[apr, rep],
+        backgroundColor:[ACCENT(), DANGER()],
+        borderColor: css('--surface') || '#fff',
+        borderWidth:3
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      cutout:'62%',
+      plugins:{
+        legend:{ position:'bottom', labels:{ color:INK(), font:{ size:13 } } },
+        tooltip:{
+          callbacks:{
+            label: ctx => {
+              const v = ctx.parsed;
+              const tot = apr + rep || 1;
+              return ` ${ctx.label}: ${v} (${(v/tot*100).toFixed(1)}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // 3. Promedio por grupo (o por materia si hay un solo grupo)
+  const useGroups = !$('f-grupo').value;
+  const keys = {};
+  VIEW.forEach(r => {
+    const k = useGroups ? (fmtGrupo(r.grupo)) : (r.examen || '—');
+    if (!keys[k]) keys[k] = { sum:0, n:0 };
+    keys[k].sum += Number(r.calificacion)||0;
+    keys[k].n++;
+  });
+  const labels3 = Object.keys(keys).sort();
+  const data3 = labels3.map(k => +(keys[k].sum/keys[k].n).toFixed(2));
+  $('c3-title').firstChild.textContent = useGroups ? 'Promedio por grupo ' : 'Promedio por materia ';
+  destroyChart('grupo');
+  charts.grupo = new Chart($('chart-grupo'), {
+    type:'bar',
+    data:{
+      labels: labels3,
+      datasets:[{
+        label:'Promedio',
+        data: data3,
+        backgroundColor: data3.map(v => v < 70 ? DANGER() : v < 80 ? WARN() : ACCENT()),
+        borderRadius:6
+      }]
+    },
+    options:{
+      ...baseOpts(),
+      indexAxis: labels3.length > 6 ? 'y' : 'x',
+      plugins:{
+        legend:{ display:false },
+        tooltip:{ callbacks:{ label: ctx => ` Promedio: ${ctx.parsed[labels3.length>6?'x':'y']} (n = ${keys[ctx.label]?.n||0})` } }
+      },
+      scales:{
+        x:{ beginAtZero:true, max:100, grid:{ color:LINE() }, ticks:{ color:MUTED() } },
+        y:{ beginAtZero:true, max:100, grid:{ color:LINE() }, ticks:{ color:MUTED() } }
+      }
+    }
+  });
+
+  // 4. Aciertos por subtema (agregado de detalle_temas)
+  const temas = {};
+  VIEW.forEach(r => {
+    const dt = r.detalle_temas;
+    if (!dt || typeof dt !== 'object') return;
+    Object.entries(dt).forEach(([k,v]) => {
+      if (!temas[k]) temas[k] = { aciertos:0, total:0 };
+      temas[k].aciertos += Number(v.aciertos)||0;
+      temas[k].total    += Number(v.total)||0;
+    });
+  });
+  const labels4 = Object.keys(temas);
+  const data4 = labels4.map(k => temas[k].total ? +(temas[k].aciertos/temas[k].total*100).toFixed(1) : 0);
+  destroyChart('temas');
+  charts.temas = new Chart($('chart-temas'), {
+    type:'bar',
+    data:{
+      labels: labels4.length ? labels4 : ['Sin datos'],
+      datasets:[{
+        label:'% de aciertos',
+        data: data4.length ? data4 : [0],
+        backgroundColor: data4.map(v => v < 50 ? DANGER() : v < 70 ? WARN() : ACCENT()),
+        borderRadius:6
+      }]
+    },
+    options:{
+      ...baseOpts(),
+      indexAxis:'y',
+      plugins:{
+        legend:{ display:false },
+        tooltip:{
+          callbacks:{
+            label: ctx => {
+              const k = ctx.label;
+              const t = temas[k] || { aciertos:0, total:0 };
+              return ` ${ctx.parsed.x}%  (${t.aciertos}/${t.total})`;
+            }
+          }
+        }
+      },
+      scales:{
+        x:{ beginAtZero:true, max:100, grid:{ color:LINE() }, ticks:{ color:MUTED() } },
+        y:{ grid:{ color:LINE() }, ticks:{ color:MUTED(), autoSkip:false } }
+      }
+    }
+  });
+
+  // 5. Motivo de finalización
+  const motivos = { manual:0, tiempo:0, violaciones:0 };
+  VIEW.forEach(r => { if (motivos[r.motivo_fin] !== undefined) motivos[r.motivo_fin]++; });
+  destroyChart('motivo');
+  charts.motivo = new Chart($('chart-motivo'), {
+    type:'pie',
+    data:{
+      labels:['Entrega manual','Se agotó el tiempo','Terminó por faltas'],
+      datasets:[{
+        data:[motivos.manual, motivos.tiempo, motivos.violaciones],
+        backgroundColor:[ACCENT(), INFO(), DANGER()],
+        borderColor: css('--surface') || '#fff',
+        borderWidth:3
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{ position:'bottom', labels:{ color:INK(), font:{ size:12 } } },
+        tooltip:{
+          callbacks:{
+            label: ctx => {
+              const tot = (motivos.manual+motivos.tiempo+motivos.violaciones) || 1;
+              return ` ${ctx.label}: ${ctx.parsed} (${(ctx.parsed/tot*100).toFixed(1)}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // 6. Faltas vs calificación (scatter)
+  const points = VIEW.map(r => ({ x: Number(r.num_faltas)||0, y: Number(r.calificacion)||0 }));
+  destroyChart('faltas');
+  charts.faltas = new Chart($('chart-faltas'), {
+    type:'scatter',
+    data:{
+      datasets:[{
+        label:'Estudiante',
+        data: points,
+        backgroundColor: points.map(p => p.y < 70 ? DANGER() : ACCENT()),
+        borderColor: 'transparent',
+        pointRadius: 6,
+        pointHoverRadius: 9
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{ display:false },
+        tooltip:{ callbacks:{ label: ctx => ` Faltas: ${ctx.parsed.x}, Calificación: ${ctx.parsed.y}` } }
+      },
+      scales:{
+        x:{ title:{ display:true, text:'Faltas', color:MUTED() }, beginAtZero:true, grid:{ color:LINE() }, ticks:{ color:MUTED(), stepSize:1 } },
+        y:{ title:{ display:true, text:'Calificación', color:MUTED() }, beginAtZero:true, max:100, grid:{ color:LINE() }, ticks:{ color:MUTED() } }
+      }
+    }
+  });
+}
+
+function baseOpts(){
+  return {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{ display:false },
+      tooltip:{ backgroundColor: INK(), titleColor:'#fff', bodyColor:'#fff', padding:10, cornerRadius:6 }
+    },
+    scales:{
+      x:{ grid:{ color:LINE() }, ticks:{ color:MUTED() } },
+      y:{ beginAtZero:true, grid:{ color:LINE() }, ticks:{ color:MUTED(), precision:0 } }
+    }
+  };
+}
+
+/* =====================================================================
+   TABLA
+   ===================================================================== */
+function renderTable(){
+  const tb = $('tbody');
+  const empty = $('tabla-empty');
+
+  if (!VIEW.length){
+    tb.innerHTML = '';
+    empty.hidden = false;
+    $('tabla-meta').textContent = '0 registros';
+    return;
+  }
+  empty.hidden = true;
+
+  const sorted = [...VIEW].sort((a,b) => {
+    const k = SORT.key;
+    let va = a[k], vb = b[k];
+    if (k === 'inicio'){ va = new Date(va||0).getTime(); vb = new Date(vb||0).getTime(); }
+    if (typeof va === 'string') va = va.toLowerCase();
+    if (typeof vb === 'string') vb = vb.toLowerCase();
+    if (va == null) va = '';
+    if (vb == null) vb = '';
+    if (va < vb) return SORT.dir === 'asc' ? -1 : 1;
+    if (va > vb) return SORT.dir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  tb.innerHTML = sorted.map(r => {
+    const c = Number(r.calificacion)||0;
+    const cls = c < 70 ? 'bad' : c < 80 ? 'mid' : 'good';
+    const pill = c >= 70
+      ? `<span class="pill ok">Aprobado</span>`
+      : `<span class="pill bad">Reprobado</span>`;
+    return `<tr>
+      <td>${escapeHtml(r.nombre || '—')}</td>
+      <td>${escapeHtml(r.matricula || '—')}</td>
+      <td>${escapeHtml(fmtGrupo(r.grupo))}</td>
+      <td>${escapeHtml(r.examen || '—')}</td>
+      <td class="grade ${cls}">${c.toFixed(1)}</td>
+      <td>${r.aciertos ?? '—'} / ${r.total_preguntas ?? '—'}</td>
+      <td>${r.num_faltas ?? 0}</td>
+      <td>${reasonLabel(r.motivo_fin)}</td>
+      <td>${fmtDur(r.duracion_seg)}</td>
+      <td>${fmtDate(r.inicio)}</td>
+    </tr>`;
+  }).join('');
+
+  $('tabla-meta').textContent = `${sorted.length} registro${sorted.length===1?'':'s'} mostrado${sorted.length===1?'':'s'}`;
+
+  // Indicadores de orden
+  document.querySelectorAll('thead th').forEach(th => {
+    th.classList.toggle('sorted', th.dataset.key === SORT.key);
+    const ar = th.querySelector('.arrow');
+    if (ar) ar.textContent = th.dataset.key === SORT.key ? (SORT.dir === 'asc' ? '▲' : '▼') : '▲▼';
+  });
+}
+
+document.querySelectorAll('thead th').forEach(th => {
+  th.addEventListener('click', () => {
+    const k = th.dataset.key;
+    if (SORT.key === k) SORT.dir = SORT.dir === 'asc' ? 'desc' : 'asc';
+    else { SORT.key = k; SORT.dir = 'asc'; }
+    renderTable();
+  });
+});
+
+/* =====================================================================
+   EXPORTACIÓN A EXCEL
+   ===================================================================== */
+$('btn-export').addEventListener('click', exportExcel);
+
+function exportExcel(){
+  if (!VIEW.length) return;
+
+  const wb = XLSX.utils.book_new();
+
+  /* Hoja 1: Resumen */
+  const n = VIEW.length;
+  const prom = VIEW.reduce((a,r) => a + (Number(r.calificacion)||0), 0) / n;
+  const apr = VIEW.filter(r => r.calificacion >= 70).length;
+  const rep = n - apr;
+  const faltasTotal = VIEW.reduce((a,r) => a + (Number(r.num_faltas)||0), 0);
+  const durProm = VIEW.reduce((a,r) => a + (Number(r.duracion_seg)||0), 0) / n;
+
+  const resumen = [
+    ['PANEL DE RESULTADOS DE EXÁMENES'],
+    ['Generado', new Date().toLocaleString('es-MX')],
+    ['Materia filtrada', $('f-materia').value || 'Todas'],
+    ['Grupo filtrado', $('f-grupo').value || 'Todos'],
+    ['Estatus filtrado', $('f-estado').value || 'Todos'],
+    ['Búsqueda', $('f-buscar').value || '—'],
+    [],
+    ['INDICADOR','VALOR'],
+    ['Estudiantes', n],
+    ['Promedio', +prom.toFixed(2)],
+    ['Aprobados', apr],
+    ['Reprobados', rep],
+    ['Tasa de aprobación (%)', +(apr/n*100).toFixed(2)],
+    ['Faltas acumuladas', faltasTotal],
+    ['Promedio de faltas', +(faltasTotal/n).toFixed(2)],
+    ['Duración promedio (min)', +(durProm/60).toFixed(2)]
+  ];
+  const ws1 = XLSX.utils.aoa_to_sheet(resumen);
+  ws1['!cols'] = [{ wch:28 }, { wch:30 }];
+  XLSX.utils.book_append_sheet(wb, ws1, 'Resumen');
+
+  /* Hoja 2: Resultados individuales */
+  const head = ['Nombre','Matrícula','Grupo','Materia','Calificación','Aciertos','Total preguntas',
+                'Faltas','Motivo de finalización','Duración (s)','Inicio','Fin'];
+  const rows = VIEW.map(r => [
+    r.nombre || '',
+    r.matricula || '',
+    fmtGrupo(r.grupo),
+    r.examen || '',
+    Number(r.calificacion)||0,
+    Number(r.aciertos)||0,
+    Number(r.total_preguntas)||0,
+    Number(r.num_faltas)||0,
+    reasonLabel(r.motivo_fin),
+    Number(r.duracion_seg)||0,
+    r.inicio ? new Date(r.inicio).toLocaleString('es-MX') : '',
+    r.fin ? new Date(r.fin).toLocaleString('es-MX') : ''
+  ]);
+  const ws2 = XLSX.utils.aoa_to_sheet([head, ...rows]);
+  ws2['!cols'] = [
+    { wch:28 },{ wch:14 },{ wch:10 },{ wch:22 },{ wch:12 },
+    { wch:10 },{ wch:14 },{ wch:8 },{ wch:18 },{ wch:12 },
+    { wch:20 },{ wch:20 }
+  ];
+  XLSX.utils.book_append_sheet(wb, ws2, 'Resultados');
+
+  /* Hoja 3: Aciertos por subtema */
+  const temas = {};
+  VIEW.forEach(r => {
+    const dt = r.detalle_temas;
+    if (!dt || typeof dt !== 'object') return;
+    Object.entries(dt).forEach(([k,v]) => {
+      if (!temas[k]) temas[k] = { aciertos:0, total:0 };
+      temas[k].aciertos += Number(v.aciertos)||0;
+      temas[k].total    += Number(v.total)||0;
+    });
+  });
+  const temaRows = Object.keys(temas).map(k => {
+    const t = temas[k];
+    const pct = t.total ? (t.aciertos/t.total*100) : 0;
+    return [k, t.aciertos, t.total, +pct.toFixed(2)];
+  });
+  const ws3 = XLSX.utils.aoa_to_sheet([['Subtema','Aciertos','Total','% de aciertos'], ...temaRows]);
+  ws3['!cols'] = [{ wch:44 },{ wch:12 },{ wch:10 },{ wch:14 }];
+  XLSX.utils.book_append_sheet(wb, ws3, 'Aciertos por subtema');
+
+  /* Hoja 4: Detalle por pregunta */
+  const pregMap = {};
+  VIEW.forEach(r => {
+    if (!Array.isArray(r.respuestas)) return;
+    r.respuestas.forEach(p => {
+      const key = p.pregunta;
+      if (!pregMap[key]) pregMap[key] = { tema:p.tema || '', ok:0, tot:0 };
+      pregMap[key].tot++;
+      if (p.correcta) pregMap[key].ok++;
+    });
+  });
+  const pregRows = Object.entries(pregMap)
+    .sort((a,b) => Number(a[0]) - Number(b[0]))
+    .map(([num, v]) => [Number(num), v.tema, v.ok, v.tot, +(v.tot ? v.ok/v.tot*100 : 0).toFixed(2)]);
+  const ws4 = XLSX.utils.aoa_to_sheet(
+    [['N° de pregunta','Subtema','Aciertos','Total','% de aciertos'], ...pregRows]
+  );
+  ws4['!cols'] = [{ wch:15 },{ wch:38 },{ wch:10 },{ wch:10 },{ wch:14 }];
+  XLSX.utils.book_append_sheet(wb, ws4, 'Detalle por pregunta');
+
+  /* Nombre de archivo con fecha */
+  const stamp = new Date().toISOString().slice(0,16).replace(/[:T]/g,'-');
+  const mat = ($('f-materia').value || 'Todas').replace(/[^a-zA-Z0-9_-]+/g,'_');
+  const grp = ($('f-grupo').value || 'Todos').replace(/[^a-zA-Z0-9_-]+/g,'_');
+  XLSX.writeFile(wb, `resultados_${mat}_${grp}_${stamp}.xlsx`);
+}
+
+/* =====================================================================
+   UTILIDADES
+   ===================================================================== */
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+function escapeAttr(s){ return escapeHtml(s); }
+
+/* Re-render de gráficas al cambiar de tema (modo claro/oscuro) */
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+  if (VIEW.length) renderCharts();
+});
+
+init();
+</script>
+</body>
+</html>
